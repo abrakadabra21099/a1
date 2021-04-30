@@ -54,6 +54,7 @@ DISKOPTS="-m data none"
 LBUOPTS="/media/sda1"
 APKCACHEOPTS="/media/sda1/cache"
 EOF
+mkdir -p /media/target
 setup-alpine -f answers
 
 apk add e2fsprogs syslinux sfdisk || exit 1
@@ -65,9 +66,16 @@ device: /dev/sda
 unit: sectors
 sector-size: 512
 
-/dev/sda1 : start=          32, size=     4194304, type=83, bootable
+/dev/sda1 : start=          32, size=     4194304, type=c, bootable
 EOF
-
-mkdir -p /media/target
-
+#/dev/sda1 : start=          32, size=     4194304, type=83, bootable
+#EOF
+#mkfs.ext3 -F /dev/sda1 || exit 2
+mkdosfs -F32 /dev/sda1 || exit 2
 dd if=/usr/share/syslinux/mbr.bin of=/dev/sda conv=notrunc
+syslinux /dev/sda1
+
+mount -t vfat /dev/sda1 /media/target || exit 3
+cp -a /media/cdrom/.alpine-release /media/cdrom/* /media/target
+umount /media/target
+echo 'All done!'
