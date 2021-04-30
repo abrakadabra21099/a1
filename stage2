@@ -3,6 +3,8 @@ sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/s
 service sshd restart
 
 usb="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
+dsk="$(df | grep /media/ | head -n1 | awk \{print\ \$1\} | sed s%1\$%%)"
+
 
 cat > answers <<EOF
 # Example answer file for setup-alpine script
@@ -50,7 +52,7 @@ SSHDOPTS="-c openssh"
 NTPOPTS="-c openntpd"
 
 # Use /dev/sda as a data disk
-DISKOPTS="-m data none"
+DISKOPTS="-m data $dsk"
 
 # Setup in /media/sdb1
 LBUOPTS="$usb"
