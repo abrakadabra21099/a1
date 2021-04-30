@@ -54,6 +54,6 @@ EOF
 setup-alpine -f answers
 
 apk add e2fsprogs syslinux
-mkdir /media/target
+mkdir -p /media/target
 
 dd if=/usr/share/syslinux/mbr.bin of=/dev/sda conv=notrunc
