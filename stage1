@@ -1,2 +1,59 @@
 #!/bin/ash
-setup-alpine -f answers
+#setup-alpine -f answers
+setup-alpine -f <<EOF
+# Example answer file for setup-alpine script
+# If you don't want to use a certain option, then comment it out
+
+# Use US layout with US variant
+KEYMAPOPTS="us us"
+
+# Set hostname to alpine-test
+HOSTNAMEOPTS="-n ovpn-stage"
+
+# Contents of /etc/network/interfaces
+INTERFACESOPTS="auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+	hostname ovpn-stage
+	address 10.118.133.133
+	netmask 255.255.252.0
+	gateway 10.118.132.1
+"
+
+# Search domain of example.com, Google public nameserver
+DNSOPTS="-d krit.pro 10.118.131.100 10.118.145.13"
+
+# Set timezone to UTC
+TIMEZONEOPTS="-z Europe/Samara"
+
+# set http/ftp proxy
+PROXYOPTS="none"
+
+# Add a random mirror
+APKREPOSOPTS="http://mirror.yandex.ru/mirrors/alpine/v3.13/main
+#http://mirror.yandex.ru/mirrors/alpine/v3.13/community
+#http://mirror.yandex.ru/mirrors/alpine/edge/main
+#http://mirror.yandex.ru/mirrors/alpine/edge/community
+#http://mirror.yandex.ru/mirrors/alpine/edge/testing
+"
+
+# Install Openssh
+SSHDOPTS="-c openssh"
+
+# Use openntpd
+NTPOPTS="-c openntpd"
+
+# Use /dev/sda as a data disk
+DISKOPTS="-m data none"
+
+# Setup in /media/sdb1
+LBUOPTS="/media/sda1"
+APKCACHEOPTS="/media/sda1/cache"
+EOF
+
+apk add e2fsprogs syslinux
+mkdir /media/target
+
+dd if=/usr/share/syslinux/mbr.bin of=/dev/sda conv=notrunc
