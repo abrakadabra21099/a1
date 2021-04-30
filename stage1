@@ -1,6 +1,5 @@
 #!/bin/ash
-#setup-alpine -f answers
-setup-alpine -f - <<EOF
+cat answers <<EOF
 # Example answer file for setup-alpine script
 # If you don't want to use a certain option, then comment it out
 
@@ -52,6 +51,7 @@ DISKOPTS="-m data none"
 LBUOPTS="/media/sda1"
 APKCACHEOPTS="/media/sda1/cache"
 EOF
+setup-alpine -f answers
 
 apk add e2fsprogs syslinux
 mkdir /media/target
