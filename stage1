@@ -1,0 +1,2 @@
+#!/bin/ash
+setup-alpine -f answers
