@@ -76,6 +76,7 @@ dd if=/usr/share/syslinux/mbr.bin of=/dev/sda conv=notrunc
 syslinux /dev/sda1
 
 mount -t vfat /dev/sda1 /media/target || exit 3
-cp -a /media/cdrom/.alpine-release /media/cdrom/* /media/target
+cdrom="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
+cp -a $cdrom/.alpine-release $cdrom/* /media/target
 umount /media/target
 echo 'All done!'
