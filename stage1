@@ -1,6 +1,6 @@
 #!/bin/ash
 #setup-alpine -f answers
-setup-alpine -f <(cat <<EOF
+setup-alpine -f - <<EOF
 # Example answer file for setup-alpine script
 # If you don't want to use a certain option, then comment it out
 
