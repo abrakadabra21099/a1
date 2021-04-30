@@ -1,10 +1,7 @@
 #!/bin/ash
-sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config
-service sshd restart
 
 usb="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
-dsk="$(df | grep /media/ | head -n1 | awk \{print\ \$1\} | sed s%1\$%%)"
-
+#dsk="$(df | grep /media/ | head -n1 | awk \{print\ \$1\} | sed s%1\$%%)"
 
 cat > answers <<EOF
 # Example answer file for setup-alpine script
@@ -60,3 +57,11 @@ APKCACHEOPTS="$usb/cache"
 EOF
 
 setup-alpine -f answers
+setup-lbu -q
+lbu ci || exit 1
+
+sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config
+service sshd restart
+
+echo 'All done!'
+
