@@ -63,7 +63,7 @@ unit: sectors
 sector-size: 512
 
 /dev/sda1 : start=          32, size=     4194304, type=83, bootable
-EOF || exit 2
+EOF
 
 mkdir -p /media/target
 
