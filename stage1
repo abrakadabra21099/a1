@@ -53,7 +53,18 @@ APKCACHEOPTS="/media/sda1/cache"
 EOF
 setup-alpine -f answers
 
-apk add e2fsprogs syslinux sfdisk
+apk add e2fsprogs syslinux sfdisk || exit 1
+
+sfdisk /dev/sda <<EOF
+label: dos
+label-id: 0x00000000
+device: /dev/sda
+unit: sectors
+sector-size: 512
+
+/dev/sda1 : start=          32, size=     4194304, type=83, bootable
+EOF || exit 2
+
 mkdir -p /media/target
 
 dd if=/usr/share/syslinux/mbr.bin of=/dev/sda conv=notrunc
