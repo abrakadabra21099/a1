@@ -1,5 +1,5 @@
 #!/bin/ash
-cat answers <<EOF
+cat > answers <<EOF
 # Example answer file for setup-alpine script
 # If you don't want to use a certain option, then comment it out
 
