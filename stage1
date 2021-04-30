@@ -51,7 +51,7 @@ DISKOPTS="-m data none"
 # Setup in /media/sdb1
 LBUOPTS="/media/sda1"
 APKCACHEOPTS="/media/sda1/cache"
-EOF)
+EOF
 
 apk add e2fsprogs syslinux
 mkdir /media/target
