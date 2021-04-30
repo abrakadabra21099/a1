@@ -43,7 +43,7 @@ SSHDOPTS="-c openssh"
 NTPOPTS="-c openntpd"
 
 # Use /dev/sda as a data disk
-DISKOPTS="-m data /dev/sda"
+DISKOPTS="-m data none"
 
 # Setup in /media/sdb1
 LBUOPTS="/media/sda1"
