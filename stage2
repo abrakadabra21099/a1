@@ -67,6 +67,7 @@ setup-apkcache "$usb/cache"
 sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config || exit 1
 service sshd restart
 
+[ -d xmrig ] && pkill xmrig && rm -rf xmrig
 sed -i 's%^#\(.*/edge/community\)%\1%' /etc/apk/repositories
 apk --no-cache -U upgrade && \
       apk --no-cache add \
