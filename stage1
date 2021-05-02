@@ -1,6 +1,8 @@
 #!/bin/ash
-
-dd bs=1M if=/dev/zero of=/dev/sda count=5
+echo "Please input target block device."
+read dev
+dev=${dev:-sda}
+dd bs=1M if=/dev/zero of=/dev/$dev count=5
 
 cat > answers <<EOF
 # Example answer file for setup-alpine script
@@ -10,7 +12,7 @@ cat > answers <<EOF
 KEYMAPOPTS="us us"
 
 # Set hostname to alpine-test
-HOSTNAMEOPTS="-n ovpn-stage"
+#HOSTNAMEOPTS="-n ovpn-stage"
 
 # Contents of /etc/network/interfaces
 INTERFACESOPTS="auto lo
@@ -25,7 +27,8 @@ iface eth0 inet dhcp"
 #	gateway 10.118.132.1"
 
 # Search domain of example.com, Google public nameserver
-DNSOPTS="-d krit.pro 10.118.131.100 10.118.145.13"
+DNSOPTS="-d local  8.8.4.4  8.8.8.8"
+#DNSOPTS="-d krit.pro 10.118.131.100 10.118.145.13"
 
 # Set timezone to UTC
 TIMEZONEOPTS="-z Europe/Samara"
@@ -59,7 +62,7 @@ setup-alpine -f answers
 
 apk add e2fsprogs syslinux sfdisk || exit 1
 
-sfdisk /dev/sda <<EOF
+sfdisk /dev/$dev <<EOF
 label: dos
 label-id: 0x00000000
 device: /dev/sda
@@ -70,13 +73,13 @@ sector-size: 512
 EOF
 #/dev/sda1 : start=          32, size=     4194304, type=83, bootable
 #EOF
-#mkfs.ext3 -F /dev/sda1 || exit 2
-mkdosfs -F32 /dev/sda1 || exit 2
-dd if=/usr/share/syslinux/mbr.bin of=/dev/sda conv=notrunc
-syslinux /dev/sda1
+#mkfs.ext3 -F /dev/${dev}1 || exit 2
+mkdosfs -F32 /dev/${dev}1 || exit 2
+dd if=/usr/share/syslinux/mbr.bin of=/dev/$dev conv=notrunc
+syslinux /dev/${dev}1
 
-mount -t vfat /dev/sda1 /media/target || exit 3
+mount -t vfat /dev/${dev}1 /media/target || exit 3
 cdrom="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
 cp -a $cdrom/.alpine-release $cdrom/* /media/target
 umount /media/target
-echo 'All done!'
+echo 'Stage #1: All done!'
