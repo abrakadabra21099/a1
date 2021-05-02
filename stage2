@@ -103,5 +103,14 @@ EOF
 chmod +x /bin/run && \
 lbu add /bin/run && \
 lbu ci && \
-run && \
+service local stop
+rc-update add local default
+
+cat > /etc/local.d/run.start <<EOF
+#!/bin/ash
+exec run
+EOF
+chmod +x /etc/local.d/run.start
+service local start
+
 echo 'Stage #2: All done!'
