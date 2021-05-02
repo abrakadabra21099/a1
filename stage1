@@ -4,6 +4,9 @@ read dev
 dev=${dev:-sda}
 dd bs=1M if=/dev/zero of=/dev/$dev count=5
 
+if=$(ip a|awk -F:\  \{print\ \$2\}|sed /^$/d|grep -v lo|head -n1)
+if={if:-eth0}
+
 cat > answers <<EOF
 # Example answer file for setup-alpine script
 # If you don't want to use a certain option, then comment it out
@@ -18,8 +21,8 @@ HOSTNAMEOPTS="-n ovpn-stage"
 INTERFACESOPTS="auto lo
 iface lo inet loopback
 
-auto eth0
-iface eth0 inet dhcp"
+auto $if
+iface $if inet dhcp"
 #static
 #	hostname ovpn-stage
 #	address 10.118.133.133

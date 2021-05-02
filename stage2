@@ -3,6 +3,9 @@
 usb="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
 #dsk="$(df | grep /media/ | head -n1 | awk \{print\ \$1\} | sed s%1\$%%)"
 
+if=$(ip a|awk -F:\  \{print\ \$2\}|sed /^$/d|grep -v lo|head -n1)
+if={if:-eth0}
+
 cat > answers <<EOF
 # Example answer file for setup-alpine script
 # If you don't want to use a certain option, then comment it out
@@ -17,8 +20,8 @@ KEYMAPOPTS="us us"
 INTERFACESOPTS="auto lo
 iface lo inet loopback
 
-auto eth0
-iface eth0 inet dhcp"
+auto $if
+iface $if inet dhcp"
 #static
 #        hostname ovpn-stage
 #        address 10.118.133.133
@@ -65,4 +68,3 @@ service sshd restart
 
 lbu ci
 echo 'Stage #2: All done!'
-
