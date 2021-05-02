@@ -5,7 +5,7 @@ dev=${dev:-sda}
 dd bs=1M if=/dev/zero of=/dev/$dev count=5
 
 if=$(ip a|awk -F:\  \{print\ \$2\}|sed /^$/d|grep -v lo|head -n1)
-if={if:-eth0}
+#if={if:-eth0}
 
 cat > answers <<EOF
 # Example answer file for setup-alpine script
