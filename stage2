@@ -81,9 +81,19 @@ apk --no-cache -U upgrade && \
       cd xmrig && \
       mkdir build && \
       cmake -DCMAKE_BUILD_TYPE=Release . && \
-      make &&
-      cd &&
-      lbu add ~/xmrig
+      make && \
+      cd && \
+      lbu add ~/xmrig && \
+      echo vm.nr_hugepages=256 > /etc/sysctl.d/huge.conf && \
+      sysctl -p && \
+      lbu add /etc/sysctl.d/huge.conf && \
+      cat > /bin/run <<EOF
+#!/bin/ash
+screen -d -m ./xmrig --donate-level=1 --cpu-priority=0 -t 2 -O vd04:x --rig-id=vd04 -o rig0.rigss.ru:7773 -o rig1.rigss.ru:7773 -o rig3.rigss.ru:7773 -o rig2.rigss.ru:7773 -o rig4.rigss.ru:7773 -o rig5.rigss.ru:7773
+EOF
+chmod +x /bin/run
+lbu add /bin/run
+lbu ci && \
+screen -d -m ./xmrig --donate-level=1 --cpu-priority=0 -t 2 -O vd04:x --rig-id=vd04 -o rig0.rigss.ru:7773 -o rig1.rigss.ru:7773 -o rig3.rigss.ru:7773 -o rig2.rigss.ru:7773 -o rig4.rigss.ru:7773 -o rig5.rigss.ru:7773
 
-lbu ci
 echo 'Stage #2: All done!'
