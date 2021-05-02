@@ -113,5 +113,5 @@ EOF
 chmod +x /etc/local.d/run.start
 service local start
 lbu ci
-
+apk -U upgrade
 echo 'Stage #2: All done!'
