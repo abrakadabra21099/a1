@@ -66,5 +66,7 @@ setup-lbu -q
 sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config || exit 1
 service sshd restart
 
+
+
 lbu ci
 echo 'Stage #2: All done!'

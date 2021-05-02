@@ -83,6 +83,6 @@ syslinux /dev/${dev}1
 
 mount -t vfat /dev/${dev}1 /media/target || exit 3
 cdrom="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
-cp -a $cdrom/.alpine-release $cdrom/* /media/target
+cp -a $cdrom/.alpine-release $cdrom/* "$(dirname "$0")" /media/target
 umount /media/target
 echo 'Stage #1: All done!'
