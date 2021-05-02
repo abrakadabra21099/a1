@@ -51,7 +51,7 @@ APKREPOSOPTS="http://mirror.yandex.ru/mirrors/alpine/v3.13/main
 SSHDOPTS="-c openssh"
 
 # Use openntpd
-NTPOPTS="-c openntpd"
+NTPOPTS="-c chrony"
 
 # Use /dev/sda as a data disk
 DISKOPTS="-m data none"

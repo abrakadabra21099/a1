@@ -50,7 +50,7 @@ APKREPOSOPTS="http://mirror.yandex.ru/mirrors/alpine/v3.13/main
 SSHDOPTS="-c openssh"
 
 # Use openntpd
-NTPOPTS="-c openntpd"
+NTPOPTS="-c chrony"
 
 # Use /dev/sda as a data disk
 DISKOPTS="-m data none"
@@ -62,11 +62,28 @@ EOF
 
 setup-alpine -f answers
 setup-lbu -q
+setup-apkcache $APKCACHEOPTS
 
 sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config || exit 1
 service sshd restart
 
-
+sed -i 's%^#\(.*/edge/community\)%\1%' /etc/apk/repositories
+apk --no-cache -U upgrade && \
+      apk --no-cache add \
+        git \
+        cmake \
+        libuv-dev \
+        build-base \
+        hwloc-dev \
+        openssl-dev \
+        screen && \
+      git clone https://github.com/xmrig/xmrig && \
+      cd xmrig && \
+      mkdir build && \
+      cmake -DCMAKE_BUILD_TYPE=Release . && \
+      make &&
+      cd &&
+      lbu add ~/xmrig
 
 lbu ci
 echo 'Stage #2: All done!'
