@@ -12,7 +12,7 @@ cat > answers <<EOF
 KEYMAPOPTS="us us"
 
 # Set hostname to alpine-test
-#HOSTNAMEOPTS="-n ovpn-stage"
+HOSTNAMEOPTS="-n ovpn-stage"
 
 # Contents of /etc/network/interfaces
 INTERFACESOPTS="auto lo

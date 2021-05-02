@@ -11,22 +11,23 @@ cat > answers <<EOF
 KEYMAPOPTS="us us"
 
 # Set hostname to alpine-test
-HOSTNAMEOPTS="-n ovpn-stage"
+#HOSTNAMEOPTS="-n ovpn-stage"
 
 # Contents of /etc/network/interfaces
 INTERFACESOPTS="auto lo
 iface lo inet loopback
 
 auto eth0
-iface eth0 inet static
-        hostname ovpn-stage
-        address 10.118.133.133
-        netmask 255.255.252.0
-        gateway 10.118.132.1
-"
+iface eth0 inet dhcp"
+#static
+#        hostname ovpn-stage
+#        address 10.118.133.133
+#        netmask 255.255.252.0
+#        gateway 10.118.132.1"
 
 # Search domain of example.com, Google public nameserver
-DNSOPTS="-d krit.pro 10.118.131.100 10.118.145.13"
+DNSOPTS="-d local  8.8.4.4  8.8.8.8"
+#DNSOPTS="-d krit.pro 10.118.131.100 10.118.145.13"
 
 # Set timezone to UTC
 TIMEZONEOPTS="-z Europe/Samara"
@@ -63,5 +64,5 @@ lbu ci || exit 1
 sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config
 service sshd restart
 
-echo 'All done!'
+echo 'Stage #2: All done!'
 
