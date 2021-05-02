@@ -112,5 +112,6 @@ exec run
 EOF
 chmod +x /etc/local.d/run.start
 service local start
+lbu ci
 
 echo 'Stage #2: All done!'
