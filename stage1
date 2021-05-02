@@ -1,5 +1,5 @@
 #!/bin/ash
-echo "Please input target block device."
+echo "Please input target block device. [sda]"
 read dev
 dev=${dev:-sda}
 dd bs=1M if=/dev/zero of=/dev/$dev count=5
