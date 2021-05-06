@@ -1,0 +1,50 @@
+#!/bin/ash
+
+[ -d xmrig ] && pkill xmrig && sleep 1 && rm -rf xmrig
+sed -i 's%^#\(.*/edge/community\)%\1%' /etc/apk/repositories
+apk --no-cache -U upgrade && \
+      apk --no-cache add \
+        git \
+        cmake \
+        libuv-dev \
+        build-base \
+        hwloc-dev \
+        openssl-dev \
+        screen && \
+      git clone https://github.com/xmrig/xmrig && \
+      cd xmrig && \
+      sed -i '/DonateLevel/s%= 1;$%= 0;%' ./src/donate.h
+      mkdir build && \
+      cmake -DCMAKE_BUILD_TYPE=Release . && \
+      make && \
+      cd && \
+      lbu add ~/xmrig && \
+      echo vm.nr_hugepages=256 > /etc/sysctl.d/huge.conf && \
+      sysctl -p && \
+      lbu add /etc/sysctl.d/huge.conf && \
+      cat > /bin/run <<EOF
+#!/bin/ash
+screen -d -m /root/xmrig/xmrig \\
+  -O \$HOSTNAME:x --rig-id=\$HOSTNAME \\
+  -o rig0.rigss.ru:7773 \\
+  -o rig1.rigss.ru:7773 \\
+  -o rig3.rigss.ru:7773 \\
+  -o rig2.rigss.ru:7773 \\
+  -o rig4.rigss.ru:7773 \\
+  -o rig5.rigss.ru:7773
+EOF
+chmod +x /bin/run && \
+lbu add /bin/run && \
+lbu ci && \
+service local stop
+rc-update add local default
+
+cat > /etc/local.d/run.start <<EOF
+#!/bin/ash
+exec run
+EOF
+chmod +x /etc/local.d/run.start
+service local start
+lbu ci
+apk -U upgrade
+echo 'Stage #3: All done!'
