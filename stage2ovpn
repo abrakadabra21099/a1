@@ -23,7 +23,8 @@ auto $if
 iface $if inet static
 	address 10.118.133.133/22
 #	netmask 255.255.252.0
-	gateway 10.118.132.1"
+	gateway 10.118.132.1
+"
 
 # Search domain of example.com, Google public nameserver
 DNSOPTS="-d local  8.8.4.4  8.8.8.8"
