@@ -1,0 +1,102 @@
+#!/bin/ash
+if [ "$1" ]; then
+  dev="$1"
+else
+  echo "Please input target block device. [sda]"
+  read dev
+fi
+dev=${dev:-sda}
+echo "Setup into device: $dev"
+
+dd bs=1M if=/dev/zero of=/dev/$dev count=5
+
+if=$(ip a|awk -F:\  \{print\ \$2\}|sed /^$/d|grep -v lo|head -n1)
+#if={if:-eth0}
+
+cat > answers <<EOF
+# Example answer file for setup-alpine script
+# If you don't want to use a certain option, then comment it out
+
+# Use US layout with US variant
+KEYMAPOPTS="us us"
+
+# Set hostname to alpine-test
+HOSTNAMEOPTS="-n stage1"
+
+# Contents of /etc/network/interfaces
+INTERFACESOPTS="auto lo
+iface lo inet loopback
+
+auto $if
+iface $if inet dhcp"
+#static
+#	hostname ovpn-stage
+#	address 10.118.133.133
+#	netmask 255.255.252.0
+#	gateway 10.118.132.1"
+
+# Search domain of example.com, Google public nameserver
+DNSOPTS="-d local  8.8.4.4  8.8.8.8"
+#DNSOPTS="-d krit.pro 10.118.131.100 10.118.145.13"
+
+# Set timezone to UTC
+TIMEZONEOPTS="-z Europe/Samara"
+
+# set http/ftp proxy
+PROXYOPTS="none"
+
+# Add a random mirror
+APKREPOSOPTS="http://mirror.yandex.ru/mirrors/alpine/v3.13/main
+#http://mirror.yandex.ru/mirrors/alpine/v3.13/community
+#http://mirror.yandex.ru/mirrors/alpine/edge/main
+#http://mirror.yandex.ru/mirrors/alpine/edge/community
+#http://mirror.yandex.ru/mirrors/alpine/edge/testing
+"
+
+# Install Openssh
+SSHDOPTS="-c openssh"
+
+# Use openntpd
+NTPOPTS="-c chrony"
+
+# Use /dev/sda as a data disk
+DISKOPTS="-m data none"
+
+# Setup in /media/sdb1
+LBUOPTS="/media/sda1"
+APKCACHEOPTS="/media/sda1/cache"
+EOF
+mkdir -p /media/target
+setup-alpine -f answers
+
+apk add e2fsprogs syslinux sfdisk || exit 1
+
+sfdisk /dev/$dev <<EOF
+label: dos
+label-id: 0x00000000
+device: /dev/sda
+unit: sectors
+sector-size: 512
+
+#/dev/sda1 : start=          32, size=     4194304, type=c, bootable
+#EOF
+/dev/sda1 : start=          32, size=     4194304, type=83, bootable
+EOF
+
+mkfs.ext3 -F /dev/${dev}1 || exit 2
+#mkdosfs -F32 /dev/${dev}1 || exit 2
+
+dd if=/usr/share/syslinux/mbr.bin of=/dev/$dev conv=notrunc
+
+#syslinux /dev/${dev}1
+
+mount -t ext3 /dev/${dev}1 /media/target || exit 3
+#mount -t vfat /dev/${dev}1 /media/target || exit 3
+
+extlinux --install /media/target || extlinux --update /media/target || exit 4
+
+cdrom="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
+cp -a $cdrom/.alpine-release $cdrom/* "$(dirname "$0")" /media/target
+umount /media/target
+
+echo 'Stage #1: All done! Need reboot and run next stage #2.'
