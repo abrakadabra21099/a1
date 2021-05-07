@@ -30,9 +30,8 @@ iface lo inet loopback
 auto $if
 #iface $if inet dhcp"
 iface $if inet static
-	hostname ovpn-stage
-	address 10.118.133.133
-	netmask 255.255.252.0
+	address 10.118.133.133/22
+#	netmask 255.255.252.0
 	gateway 10.118.132.1"
 
 # Search domain of example.com, Google public nameserver
