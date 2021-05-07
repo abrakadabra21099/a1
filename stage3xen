@@ -1,0 +1,6 @@
+#!/bin/ash
+apk add lvm2 vlan thin-provisioning-tools bonding multipath-tools || exit 1
+#modprobe multipath
+lbu ci
+apk -U upgrade
+echo 'Stage #3: All done!'
