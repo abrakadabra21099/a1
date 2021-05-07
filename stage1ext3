@@ -28,16 +28,16 @@ INTERFACESOPTS="auto lo
 iface lo inet loopback
 
 auto $if
-iface $if inet dhcp"
-#static
-#	hostname ovpn-stage
-#	address 10.118.133.133
-#	netmask 255.255.252.0
-#	gateway 10.118.132.1"
+#iface $if inet dhcp"
+iface $if inet static
+	hostname ovpn-stage
+	address 10.118.133.133
+	netmask 255.255.252.0
+	gateway 10.118.132.1"
 
 # Search domain of example.com, Google public nameserver
-DNSOPTS="-d local  8.8.4.4  8.8.8.8"
-#DNSOPTS="-d krit.pro 10.118.131.100 10.118.145.13"
+#DNSOPTS="-d local  8.8.4.4  8.8.8.8"
+DNSOPTS="-d krit.pro 10.118.131.100 10.118.145.13"
 
 # Set timezone to UTC
 TIMEZONEOPTS="-z Europe/Samara"
@@ -74,13 +74,13 @@ apk add e2fsprogs syslinux sfdisk || exit 1
 sfdisk /dev/$dev <<EOF
 label: dos
 label-id: 0x00000000
-device: /dev/sda
+device: /dev/none
 unit: sectors
 sector-size: 512
 
-#/dev/sda1 : start=          32, size=     4194304, type=c, bootable
+#/dev/none : start=          32, size=     4194304, type=c, bootable
 #EOF
-/dev/sda1 : start=          32, size=     4194304, type=83, bootable
+/dev/none : start=          32, size=     20971520, type=83, bootable
 EOF
 
 mkfs.ext3 -F /dev/${dev}1 || exit 2
