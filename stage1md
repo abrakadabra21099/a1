@@ -213,14 +213,14 @@ sector-size: 512
 /dev/none : start=          32, size=     20971520, type=83, bootable
 EOF
 
-mkfs.ext4 -F /dev/${dev}1 || exit 2
+mkfs.ext3 -F /dev/${dev}1 || exit 2
 #mkdosfs -F32 /dev/${dev}1 || exit 2
 
 dd if=/usr/share/syslinux/mbr.bin of=/dev/$dev conv=notrunc
 
 #syslinux /dev/${dev}1
 
-mount -t ext4 /dev/${dev}1 /media/target || exit 3
+mount -t ext3 /dev/${dev}1 /media/target || exit 3
 #mount -t vfat /dev/${dev}1 /media/target || exit 3
 
 extlinux --install /media/target || extlinux --update /media/target || exit 4
