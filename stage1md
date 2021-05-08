@@ -33,20 +33,20 @@ source /etc/network/interfaces.d/*
 auto lo
 iface lo inet loopback
 
-# 1 gbit uplink, LACP 
-auto eno1
+# 1 gbit uplink, LACP
+auto eth0
   iface eno1 inet manual
   up ip link set $IFACE up
   down ip link set $IFACE down
 
-auto eno2
+auto eth1
   iface eno2 inet manual
   up ip link set $IFACE up
   down ip link set $IFACE down
 
 auto bond0
   iface bond0 inet manual
-  bond-slaves eno1 eno2
+  bond-slaves eth0 eth1
   bond_mode 802.3ad
   bond_miimon 100
   bond_downdelay 200  
