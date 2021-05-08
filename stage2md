@@ -1,0 +1,202 @@
+#!/bin/ash
+
+usb="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
+#dsk="$(df | grep /media/ | head -n1 | awk \{print\ \$1\} | sed s%1\$%%)"
+
+if=$(ip a|awk -F:\  \{print\ \$2\}|sed /^$/d|grep -v lo|head -n1)
+
+cat > answers <<EOF
+# Example answer file for setup-alpine script
+# If you don't want to use a certain option, then comment it out
+
+# Use US layout with US variant
+KEYMAPOPTS="us us"
+
+# Set hostname to alpine-test
+HOSTNAMEOPTS="-n ovpn-stage"
+
+# Contents of /etc/network/interfaces
+INTERFACESOPTS="# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# 1 gbit uplink, LACP
+auto eth0
+  iface eno1 inet manual
+  up ip link set $IFACE up
+  down ip link set $IFACE down
+
+auto eth1
+  iface eno2 inet manual
+  up ip link set $IFACE up
+  down ip link set $IFACE down
+
+auto bond0
+  iface bond0 inet manual
+  bond-slaves eth0 eth1
+  bond_mode 802.3ad
+  bond_miimon 100
+  bond_downdelay 200  
+  bond_updelay 200
+  bond_xmit_hash_policy layer2+3
+ 
+
+auto br4000
+  iface br4000 inet manual
+#  iface br4000 inet static
+##  pre-up brctl addbr br4000
+##  pre-up ip link set dev bond0 up
+#  address 192.168.1.124
+#  netmask 255.255.255.0
+#  broadcast 192.168.1.255
+#  gateway 192.168.1.1
+#  hostname xeno
+#  post-down brctl delbr br4000
+  bridge_ports bond0
+  bridge_stp off
+  bridge_fd 0.0
+
+
+auto br1
+  iface br1 inet static
+  address 192.168.0.7
+  netmask 255.255.255.0
+  broadcast 192.168.0.255
+  gateway 192.168.0.1
+  hostname xeno1
+  dns-nameservers 192.168.0.1
+  dns-search magazindeneg.com
+  bridge_ports bond0.1
+  bridge_stp off
+  bridge_fd 0.0
+
+
+auto br2
+  iface br2 inet manual
+  bridge_ports bond0.2
+  bridge_stp off
+  bridge_fd 0.0
+
+#auto bond0.2
+#  iface bond0.2 inet manual
+
+
+auto br3
+  iface br3 inet manual
+  bridge_ports bond0.3
+  bridge_stp off
+  bridge_fd 0.0
+
+#auto bond0.3
+#  iface bond0.3 inet manual
+
+
+auto br4
+  iface br4 inet manual
+  bridge_ports bond0.4
+  bridge_stp off
+  bridge_fd 0.0
+
+#auto bond0.4
+#  iface bond0.4 inet manual
+
+
+auto br5
+  iface br5 inet manual
+  bridge_ports bond0.5
+  bridge_stp off
+  bridge_fd 0.0
+
+#auto bond0.5
+#  iface bond0.5 inet manual
+
+
+auto br10
+  iface br10 inet manual
+  bridge_ports bond0.10
+  bridge_stp off
+  bridge_fd 0.0
+
+#auto bond0.10
+#  iface bond0.10 inet manual
+
+
+auto br40
+  iface br40 inet static
+  address 192.168.40.5
+  netmask 255.255.255.0
+  gateway 192.168.40.254
+  broadcast 192.168.40.255
+  bridge_ports bond0.40
+  bridge_stp off
+  bridge_fd 0.0
+
+#auto bond0.40
+#  iface bond0.40 inet manual
+
+
+auto br50
+  iface br50 inet manual
+  bridge_ports bond0.50
+  bridge_stp off
+  bridge_fd 0.0
+
+#auto bond0.50
+#  iface bond0.50 inet manual
+
+auto brnone
+  iface brnone inet manual
+  bridge_ports none
+  bridge_stp off
+  bridge_fd 0.0
+"
+
+# Search domain of example.com, Google public nameserver
+#DNSOPTS="-d local  8.8.4.4  8.8.8.8"
+#DNSOPTS="-d krit.pro 10.118.131.100 10.118.145.13"
+DNSOPTS="-d magazindeneg.com 192.168.0.1"
+
+# Set timezone to UTC
+TIMEZONEOPTS="-z Europe/Samara"
+
+# set http/ftp proxy
+PROXYOPTS="none"
+
+# Add a random mirror
+APKREPOSOPTS="http://mirror.yandex.ru/mirrors/alpine/v3.13/main
+#http://mirror.yandex.ru/mirrors/alpine/v3.13/community
+#http://mirror.yandex.ru/mirrors/alpine/edge/main
+#http://mirror.yandex.ru/mirrors/alpine/edge/community
+#http://mirror.yandex.ru/mirrors/alpine/edge/testing
+"
+
+# Install Openssh
+SSHDOPTS="-c openssh"
+
+# Use openntpd
+NTPOPTS="-c chrony"
+
+# Use /dev/sda as a data disk
+DISKOPTS="-m data none"
+
+# Setup in /media/sdb1
+LBUOPTS="$usb"
+APKCACHEOPTS="$usb/cache"
+EOF
+
+setup-alpine -f answers
+setup-lbu -q
+setup-apkcache "$usb/cache"
+
+sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config || exit 1
+service sshd restart
+
+lbu ci
+apk -U upgrade
+
+echo 'Stage #2: All done! Need run next stage #3.'
