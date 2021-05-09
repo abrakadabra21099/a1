@@ -13,7 +13,7 @@ cat > answers <<EOF
 KEYMAPOPTS="us us"
 
 # Set hostname to alpine-test
-HOSTNAMEOPTS="-n ovpn-stage"
+HOSTNAMEOPTS="-n xeno1"
 
 # Contents of /etc/network/interfaces
 INTERFACESOPTS="# This file describes the network interfaces available on your system
