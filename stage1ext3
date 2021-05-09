@@ -24,15 +24,18 @@ KEYMAPOPTS="us us"
 HOSTNAMEOPTS="-n stage1"
 
 # Contents of /etc/network/interfaces
-INTERFACESOPTS="auto lo
+INTERFACESOPTS="# The loopback network interface
+auto lo
 iface lo inet loopback
 
 auto $if
-#iface $if inet dhcp"
+#iface $if inet dhcp
+#"
 iface $if inet static
 	address 10.118.133.133/22
 #	netmask 255.255.252.0
-	gateway 10.118.132.1"
+	gateway 10.118.132.1
+"
 
 # Search domain of example.com, Google public nameserver
 #DNSOPTS="-d local  8.8.4.4  8.8.8.8"
@@ -62,13 +65,13 @@ NTPOPTS="-c chrony"
 DISKOPTS="-m data none"
 
 # Setup in /media/sdb1
-LBUOPTS="/media/sda1"
-APKCACHEOPTS="/media/sda1/cache"
+LBUOPTS="/media/${dev}1"
+APKCACHEOPTS="/media/${dev}1/cache"
 EOF
 mkdir -p /media/target
 setup-alpine -f answers
 
-apk add e2fsprogs syslinux sfdisk || exit 1
+apk add e2fsprogs syslinux sfdisk bridge bridge-utils bonding || exit 1
 
 sfdisk /dev/$dev <<EOF
 label: dos

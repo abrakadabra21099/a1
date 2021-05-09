@@ -10,7 +10,7 @@ echo "Setup into device: $dev"
 
 dd bs=1M if=/dev/zero of=/dev/$dev count=5
 
-if=$(ip a|awk -F:\  \{print\ \$2\}|sed /^$/d|grep -v lo|head -n1)
+#if=$(ip a|awk -F:\  \{print\ \$2\}|sed /^$/d|grep -v lo|head -n1)
 #if={if:-eth0}
 
 cat > answers <<EOF
@@ -28,7 +28,6 @@ INTERFACESOPTS="# The loopback network interface
 auto lo
 iface lo inet loopback
 
-# 1 gbit uplink, LACP
 auto eth0
   iface eth0 inet dhcp
 "
@@ -68,7 +67,7 @@ EOF
 mkdir -p /media/target
 setup-alpine -f answers
 
-apk add e2fsprogs syslinux sfdisk bridge bridge-utils bonding|| exit 1
+apk add e2fsprogs syslinux sfdisk bridge bridge-utils bonding || exit 1
 
 sfdisk /dev/$dev <<EOF
 label: dos
