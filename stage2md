@@ -19,7 +19,7 @@ HOSTNAMEOPTS="-n ovpn-stage"
 INTERFACESOPTS="# This file describes the network interfaces available on your system
 # and how to activate them. For more information, see interfaces(5).
 
-source /etc/network/interfaces.d/*
+#source /etc/network/interfaces.d/*
 
 # The loopback network interface
 auto lo
@@ -41,10 +41,10 @@ auto bond0
   bond-slaves eth0 eth1
   bond_mode 802.3ad
   bond_miimon 100
-  bond_downdelay 200  
+  bond_downdelay 200
   bond_updelay 200
   bond_xmit_hash_policy layer2+3
- 
+
 
 auto br4000
   iface br4000 inet manual
