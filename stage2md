@@ -27,18 +27,20 @@ iface lo inet loopback
 
 # 1 gbit uplink, LACP
 auto eth0
-  iface eno1 inet manual
-  up ip link set $IFACE up
-  down ip link set $IFACE down
+  iface eth0 inet dhcp
+#manual
+#  up ip link set $IFACE up
+#  down ip link set $IFACE down
 
 auto eth1
-  iface eno2 inet manual
+  iface eth1 inet manual
   up ip link set $IFACE up
   down ip link set $IFACE down
 
 auto bond0
   iface bond0 inet manual
-  bond-slaves eth0 eth1
+  bond-slaves eth0
+#  bond-slaves eth0 eth1
   bond_mode 802.3ad
   bond_miimon 100
   bond_downdelay 200
@@ -67,7 +69,7 @@ auto br1
   address 192.168.0.7
   netmask 255.255.255.0
   broadcast 192.168.0.255
-  gateway 192.168.0.1
+#  gateway 192.168.0.1
   hostname xeno1
   dns-nameservers 192.168.0.1
   dns-search magazindeneg.com
