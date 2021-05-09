@@ -26,12 +26,12 @@ auto lo
 iface lo inet loopback
 
 # 1 gbit uplink, LACP
-#auto eth0
-#  iface eth0 inet dhcp
 auto eth0
-  iface eth0 inet manual
-  up ip link set \$IFACE up
-  down ip link set \$IFACE down
+  iface eth0 inet dhcp
+#auto eth0
+#  iface eth0 inet manual
+#  up ip link set \$IFACE up
+#  down ip link set \$IFACE down
 
 auto eth1
   iface eth1 inet manual
@@ -40,7 +40,7 @@ auto eth1
 
 auto bond0
   iface bond0 inet manual
-  bond-slaves eth0
+  bond-slaves eth1
 #  bond-slaves eth0 eth1
   bond_mode 802.3ad
   bond_miimon 100
