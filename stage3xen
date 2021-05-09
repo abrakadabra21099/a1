@@ -1,5 +1,5 @@
 #!/bin/ash
-apk add lvm2 vlan thin-provisioning-tools bonding multipath-tools bridge bridge-utils || exit 1
+apk add lvm2 vlan thin-provisioning-tools bonding multipath-tools bridge bridge-utils nano || exit 1
 #modprobe multipath
 lbu ci
 apk -U upgrade

@@ -59,7 +59,7 @@ APKCACHEOPTS="$usb/cache"
 EOF
 
 setup-alpine -f answers
-setup-lbu -q
+setup-lbu "$usb"
 setup-apkcache "$usb/cache"
 
 sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config || exit 1
