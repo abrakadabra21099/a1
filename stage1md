@@ -193,13 +193,13 @@ NTPOPTS="-c chrony"
 DISKOPTS="-m data none"
 
 # Setup in /media/sdb1
-LBUOPTS="/media/sda1"
-APKCACHEOPTS="/media/sda1/cache"
+LBUOPTS="/media/${dev}1"
+APKCACHEOPTS="/media/${dev}1/cache"
 EOF
 mkdir -p /media/target
 setup-alpine -f answers
 
-apk add e2fsprogs syslinux sfdisk || exit 1
+apk add e2fsprogs syslinux sfdisk bridge bridge-utils bonding|| exit 1
 
 sfdisk /dev/$dev <<EOF
 label: dos
