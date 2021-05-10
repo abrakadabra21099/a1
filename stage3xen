@@ -1,5 +1,9 @@
 #!/bin/ash
 apk add lvm2 vlan thin-provisioning-tools bonding multipath-tools bridge bridge-utils nano || exit 1
+sed -i 's%^XENDOMAINS_SAVE=.*%XENDOMAINS_SAVE=%' /etc/default/xendomains
+grep -q '^\tfilter = ' /etc/lvm/lvm.conf || \
+	sed -i '/# filter = \[ "a|\.\*\/|" \]/a \\tfilter = [ "a|^/dev/sd.*|", "r/.*/" ]' /etc/lvm/lvm.conf
+sed -i 's%^\twrite_cache_state = 1$%\twrite_cache_state = 0%' /etc/lvm/lvm.conf
 #modprobe multipath
 lbu ci
 apk -U upgrade
