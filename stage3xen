@@ -5,6 +5,8 @@ grep -q '^\tfilter = ' /etc/lvm/lvm.conf || \
 	sed -i '/# filter = \[ "a|\.\*\/|" \]/a \\tfilter = [ "a|^/dev/sd.*|", "r/.*/" ]' /etc/lvm/lvm.conf
 sed -i 's%^\twrite_cache_state = 1$%\twrite_cache_state = 0%' /etc/lvm/lvm.conf
 #modprobe multipath
+lbu inc /etc/xen
+lbu inc /root/.ssh
 lbu ci
 apk -U upgrade
 echo 'Stage #3: All done!'
