@@ -5,6 +5,12 @@ apk -U add docker docker-compose e2fsprogs-extra gptfdisk cfdisk lvm2 thin-provi
 #apk -U add docker docker-compose || exit 3
 
 rc-update add docker boot
+cat > /etc/docker/daemon.json <<EOF
+{
+  "log-driver": "json-file",
+  "log-opts": {"max-size": "2m", "max-file": "3"}
+}
+EOF
 service docker start
 
 rc-update add local
