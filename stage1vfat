@@ -79,12 +79,19 @@ device: /dev/none
 unit: sectors
 sector-size: 512
 
-/dev/sda1 : start=          32, size=     4194304, type=c, bootable
+#2GB vfat
+/dev/none : start=          32, size=     4194304, type=c, bootable
+ 
+#2GB ext3
+#/dev/none : start=          32, size=     4194304, type=83, bootable
+ 
+#9GB ext3
+#/dev/none : start=          32, size=     20971520, type=83, bootable
 EOF
-#/dev/sda1 : start=          32, size=     4194304, type=83, bootable
-#EOF
+
 #mkfs.ext3 -F /dev/${dev}1 || exit 2
 mkdosfs -F32 /dev/${dev}1 || exit 2
+
 dd if=/usr/share/syslinux/mbr.bin of=/dev/$dev conv=notrunc
 syslinux /dev/${dev}1
 

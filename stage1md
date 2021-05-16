@@ -76,8 +76,13 @@ device: /dev/none
 unit: sectors
 sector-size: 512
 
+#2GB vfat
 #/dev/none : start=          32, size=     4194304, type=c, bootable
-#EOF
+
+#2GB ext3
+#/dev/none : start=          32, size=     4194304, type=83, bootable
+
+#9GB ext3
 /dev/none : start=          32, size=     20971520, type=83, bootable
 EOF
 
