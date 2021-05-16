@@ -14,9 +14,12 @@ lbu ci
 exit 0
 EOF
 chmod +x /etc/local.d/lbu.stop
+service local start
 
 lbu inc /root/.ssh
+
 rc-update add lvm boot
+
 lbu ci
 apk -U upgrade
 echo 'Stage #3: All done!'
