@@ -1,5 +1,6 @@
 #!/bin/ash
-apk add docker e2fsprogs-extra gptfdisk cfdisk lvm2 thin-provisioning-tools bridge bridge-utils nano screen || exit 1
+sed -i '/\/v.*\/community$/s%^#%%' /etc/apk/repositories
+apk -U add docker e2fsprogs-extra gptfdisk cfdisk lvm2 thin-provisioning-tools bridge bridge-utils nano screen || exit 1
 df /var/lib/docker >/dev/null || exit 2
 
 rc-update add docker boot
@@ -12,7 +13,6 @@ lbu ci
 exit 0
 EOF
 
-sed -i '/\/v.*\/community$/s%^#%%' /etc/apk/repositories
 lbu inc /root/.ssh
 rc-update add lvm boot
 lbu ci
