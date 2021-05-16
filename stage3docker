@@ -1,7 +1,8 @@
 #!/bin/ash
 sed -i '/\/v.*\/community$/s%^#%%' /etc/apk/repositories
-apk -U add docker e2fsprogs-extra gptfdisk cfdisk lvm2 thin-provisioning-tools bridge bridge-utils nano screen || exit 1
+apk -U add e2fsprogs-extra gptfdisk cfdisk lvm2 thin-provisioning-tools bridge bridge-utils nano screen || exit 1
 df /var/lib/docker >/dev/null || exit 2
+apk -U add docker docker-compose || exit 3
 
 rc-update add docker boot
 service docker start
