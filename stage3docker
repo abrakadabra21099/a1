@@ -24,6 +24,7 @@ chmod +x /etc/local.d/lbu.stop
 service local start
 
 lbu inc /root/.ssh
+lbu inc /var/lib/docker
 
 rc-update add lvm boot
 
