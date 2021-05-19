@@ -104,7 +104,8 @@ mount -t ext4 /dev/${dev}1 /media/target || exit 3
 #mount -t vfat /dev/${dev}1 /media/target || exit 3
 
 # Only for ext3 need.
-extlinux --install /media/target || extlinux --update /media/target || exit 4
+#extlinux --install /media/target || extlinux --update /media/target || exit 4
+setup-bootable -f /dev/sr0 /media/target
 
 cdrom="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
 cp -a $cdrom/.alpine-release $cdrom/* "$(dirname "$0")/" /media/target
