@@ -1,6 +1,6 @@
 #!/bin/ash
 
-usb="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
+usb="$(df | grep /media/ | grep -v sr0 | head -n1 | awk \{print\ \$6\})"
 #dsk="$(df | grep /media/ | head -n1 | awk \{print\ \$1\} | sed s%1\$%%)"
 
 if=$(ip a|awk -F:\  \{print\ \$2\}|sed /^$/d|grep -v lo|head -n1)
