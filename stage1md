@@ -86,7 +86,7 @@ sector-size: 512
 #/dev/none : start=          32, size=     6291456, type=83, bootable
 
 #9GB ext3
-/dev/none : start=          32, size=     20971520, type=83, bootable
+/dev/none : start=          32, size=     18874368, type=83, bootable
 EOF
 
 mkfs.ext3 -F /dev/${dev}1 || exit 2
