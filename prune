@@ -1,0 +1,11 @@
+#!/bin/ash
+if [ "$1" ]; then
+  dev="$1"
+else
+  echo "Please input target block device. [sda]"
+  read dev
+fi
+dev=${dev:-sda}
+echo "Prune device: $dev"
+
+dd bs=1M if=/dev/zero of=/dev/$dev count=5
