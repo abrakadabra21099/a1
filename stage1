@@ -93,19 +93,18 @@ sector-size: 512
 /dev/none : start=          32, size=     18874368, type=83, bootable
 EOF
 
-mkfs.ext4 -F /dev/${dev}1 || exit 2
+mkfs.ext3 -F /dev/${dev}1 || exit 2
 #mkdosfs -F32 /dev/${dev}1 || exit 2
 
 dd if=/usr/share/syslinux/mbr.bin of=/dev/$dev conv=notrunc
 # Only for vfat need.
 #syslinux /dev/${dev}1
 
-mount -t ext4 /dev/${dev}1 /media/target || exit 3
+mount -t ext3 /dev/${dev}1 /media/target || exit 3
 #mount -t vfat /dev/${dev}1 /media/target || exit 3
 
 # Only for ext3 need.
-#extlinux --install /media/target || extlinux --update /media/target || exit 4
-setup-bootable -f /dev/sr0 /media/target
+extlinux --install /media/target || extlinux --update /media/target || exit 4
 
 cdrom="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
 cp -a $cdrom/.alpine-release $cdrom/* "$(dirname "$0")/" /media/target
