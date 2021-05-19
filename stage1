@@ -31,15 +31,15 @@ iface lo inet loopback
 auto $if
 iface $if inet dhcp
 "
-#static
-#	hostname ovpn-stage
-#	address 10.118.133.133
-#	netmask 255.255.252.0
-#	gateway 10.118.132.1"
+#iface $if inet static
+#	hostname stage1
+#	address 10.118.133.133/22
+#	gateway 10.118.132.1
+#"
 
 # Search domain of example.com, Google public nameserver
-DNSOPTS="-d local  8.8.4.4  8.8.8.8"
-#DNSOPTS="-d krit.pro 10.118.131.100 10.118.145.13"
+#DNSOPTS="-d local  8.8.4.4  8.8.8.8"
+DNSOPTS="-d krit.pro 10.118.131.100 10.118.145.13"
 
 # Set timezone to UTC
 TIMEZONEOPTS="-z Europe/Samara"
@@ -81,22 +81,28 @@ unit: sectors
 sector-size: 512
 
 #2GB vfat
-/dev/none : start=          32, size=     4194304, type=c, bootable
+#/dev/none : start=          32, size=     4194304, type=c, bootable
 
 #2GB ext3
-#/dev/none : start=          32, size=     4194304, type=83, bootable
+/dev/none : start=          32, size=     4194304, type=83, bootable
 
 #9GB ext3
 #/dev/none : start=          32, size=     20971520, type=83, bootable
 EOF
 
-#mkfs.ext3 -F /dev/${dev}1 || exit 2
-mkdosfs -F32 /dev/${dev}1 || exit 2
+mkfs.ext3 -F /dev/${dev}1 || exit 2
+#mkdosfs -F32 /dev/${dev}1 || exit 2
 
 dd if=/usr/share/syslinux/mbr.bin of=/dev/$dev conv=notrunc
-syslinux /dev/${dev}1
+# Only for vfat need.
+#syslinux /dev/${dev}1
 
+#mount -t ext3 /dev/${dev}1 /media/target || exit 3
 mount -t vfat /dev/${dev}1 /media/target || exit 3
+
+# Only for ext3 need.
+extlinux --install /media/target || extlinux --update /media/target || exit 4
+
 cdrom="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
 cp -a $cdrom/.alpine-release $cdrom/* "$(dirname "$0")/" /media/target
 umount /media/target
