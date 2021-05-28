@@ -83,6 +83,9 @@ sector-size: 512
 #2GB vfat
 #/dev/none : start=          32, size=     4194304, type=c, bootable
 
+#1GB ext3
+#/dev/none : start=          32, size=     2097152, type=83, bootable
+
 #2GB ext3
 #/dev/none : start=          32, size=     4194304, type=83, bootable
 
