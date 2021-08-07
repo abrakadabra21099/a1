@@ -38,8 +38,8 @@ TIMEZONEOPTS="-z Europe/Samara"
 PROXYOPTS="none"
 
 # Add a random mirror
-APKREPOSOPTS="http://mirror.yandex.ru/mirrors/alpine/v3.13/main
-#http://mirror.yandex.ru/mirrors/alpine/v3.13/community
+APKREPOSOPTS="http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/main
+#http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/community
 #http://mirror.yandex.ru/mirrors/alpine/edge/main
 #http://mirror.yandex.ru/mirrors/alpine/edge/community
 #http://mirror.yandex.ru/mirrors/alpine/edge/testing
