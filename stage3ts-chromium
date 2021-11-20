@@ -5,6 +5,7 @@ apk add chromium
 
 apk add mesa-egl xf86-video-fbdev xf86-video-vesa dbus setxkbmap kbd xrandr xset
 adduser -D kiosk
+lbu inc /home/kiosk
 sed -i '/^tty1::/s%.*%tty1::respawn:/bin/login -f kiosk%' /etc/inittab
 
 cat << EOF > /etc/X11/xorg.conf
