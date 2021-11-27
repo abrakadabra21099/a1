@@ -1,12 +1,12 @@
 #!/bin/ash
 setup-xorg-base
 
-apk add chromium
+apk add chromium firefox-esr
 
-apk add mesa-egl xf86-video-fbdev xf86-video-vesa dbus setxkbmap kbd xrandr xset
-## xterm
-##apk search mesa-dri- | cut -d- -f-3 | xargs apk add
-##apk search xf86-video- | cut -d- -f-3 | xargs apk add
+apk add mesa-egl xf86-video-fbdev xf86-video-vesa dbus setxkbmap kbd xrandr xset xf86-video-modesetting 
+#xterm
+apk search mesa-dri- | cut -d- -f-3 | xargs apk add
+apk search xf86-video- | cut -d- -f-3 | xargs apk add
 ##adduser -D kiosk
 ##addgroup kiosk video
 ##addgroup kiosk input
@@ -18,7 +18,30 @@ cat << EOF > /etc/X11/xinit/xinitrc.d/startup
 #!/bin/ash
 xset q
 xset s off
-chromium-browser --home-page https://google.ru --no-sandbox --window-size=1920,1280 --start-fullscreen --test-type
+chromium-browser https://youtu.be/ \
+--window-size=1024,768 \
+--window-position=0,0 \
+--kiosk \
+--no-sandbox \
+--full-screen \
+--incognito \
+--noerrdialogs \
+--disable-translate \
+--no-first-run \
+--fast \
+--fast-start \
+--ignore-gpu-blacklist \
+--disable-quic \
+--enable-fast-unload \
+--enable-tcp-fast-open \
+---enable-native-gpu-memory-buffers \
+--enable-gpu-rasterization \
+--enable-zero-copy \
+--disable-infobars \
+--disable-features=TranslateUI \
+--disk-cache-dir=/tmp
+
+poweroff
 EOF
 chmod +x /etc/X11/xinit/xinitrc.d/startup
 ##cat << EOF > /etc/X11/xorg.conf
