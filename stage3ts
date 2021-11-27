@@ -1,0 +1,86 @@
+#!/bin/ash
+setup-xorg-base
+
+apk add chromium
+
+apk add mesa-egl xf86-video-fbdev xf86-video-vesa dbus setxkbmap kbd xrandr xset
+## xterm
+##apk search mesa-dri- | cut -d- -f-3 | xargs apk add
+##apk search xf86-video- | cut -d- -f-3 | xargs apk add
+##adduser -D kiosk
+##addgroup kiosk video
+##addgroup kiosk input
+##lbu inc /home/kiosk
+##sed -i '/^tty1::/s%.*%tty1::respawn:/bin/login -f kiosk%' /etc/inittab
+sed -i '/^tty1::/s%.*%tty1::respawn:/bin/login -f root%' /etc/inittab
+
+cat << EOF > /etc/X11/xinit/xinitrc.d/startup
+#!/bin/ash
+xset q
+xset s off
+chromium-browser --home-page https://google.ru --no-sandbox --window-size=1920,1280 --start-fullscreen --test-type
+EOF
+chmod +x /etc/X11/xinit/xinitrc.d/startup
+##cat << EOF > /etc/X11/xorg.conf
+##Section "ServerFlags"
+##    Option "DontVTSwitch" "true"
+##    Option "DontZap" "true"
+##EndSection
+##EOF
+
+cat << EOF > /etc/X11/xorg.conf
+Section "Extensions"
+    Option      "DPMS" "Disable"
+EndSection
+EOF
+
+##cat << EOF > /home/kiosk/.profile
+###!/bin/sh
+### start X server
+##exec startx
+##EOF
+##cat << EOF > /home/kiosk/.xinitrc
+###!/bin/sh
+### turn off screensaver
+
+##xset -dpms
+##xset s off
+##xset s noblank
+
+### screen size
+##w="1920"
+##h="1080"
+
+### url
+##url="https://dev.to"
+
+##exec chromium-browser \\
+##\$url \\
+##--window-size=\$w,\$h \\
+##--window-position=0,0 \\
+##--kiosk \\
+##--no-sandbox \\
+##--full-screen \\
+##--incognito \\
+##--noerrdialogs \\
+##--disable-translate \\
+##--no-first-run \\
+##--fast \\
+##--fast-start \\
+##--ignore-gpu-blacklist \\
+##--disable-quic \\
+##--enable-fast-unload \\
+##--enable-tcp-fast-open \\
+##---enable-native-gpu-memory-buffers \\
+##--enable-gpu-rasterization \\
+##--enable-zero-copy \\
+##--disable-infobars \\
+##--disable-features=TranslateUI \\
+##--disk-cache-dir=/tmp
+##EOF
+##chmod u+x /home/kiosk/.profile
+##chmod u+x /home/kiosk/.xinitrc
+
+lbu ci
+#apk -U upgrade
+echo 'Stage #3: All done!'
