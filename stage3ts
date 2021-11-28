@@ -1,8 +1,8 @@
 #!/bin/ash
 setup-xorg-base
 
-apk add chromium firefox-esr
-
+apk add chromium firefox-esr alsa-utils alsa-utils-doc alsa-lib alsaconf
+addgroup root audio
 apk add mesa-egl xf86-video-fbdev xf86-video-vesa dbus setxkbmap kbd xrandr xset xf86-video-modesetting 
 #xterm
 apk search mesa-dri- | cut -d- -f-3 | xargs apk add
@@ -10,6 +10,7 @@ apk search xf86-video- | cut -d- -f-3 | xargs apk add
 ##adduser -D kiosk
 ##addgroup kiosk video
 ##addgroup kiosk input
+##addgroup kiosk audio
 ##lbu inc /home/kiosk
 ##sed -i '/^tty1::/s%.*%tty1::respawn:/bin/login -f kiosk%' /etc/inittab
 sed -i '/^tty1::/s%.*%tty1::respawn:/bin/login -f root%' /etc/inittab
