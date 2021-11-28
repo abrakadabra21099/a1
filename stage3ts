@@ -3,6 +3,8 @@ setup-xorg-base
 
 apk add chromium firefox-esr alsa-utils alsa-utils-doc alsa-lib alsaconf freerdp freerdp-plugins
 addgroup root audio
+rc-service alsa start
+rc-update add alsa
 apk add mesa-egl xf86-video-fbdev xf86-video-vesa dbus setxkbmap kbd xrandr xset xf86-video-modesetting 
 #xterm
 apk search mesa-dri- | cut -d- -f-3 | xargs apk add
