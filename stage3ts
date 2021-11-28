@@ -1,7 +1,7 @@
 #!/bin/ash
 setup-xorg-base
 
-apk add chromium firefox-esr alsa-utils alsa-utils-doc alsa-lib alsaconf
+apk add chromium firefox-esr alsa-utils alsa-utils-doc alsa-lib alsaconf freerdp freerdp-plugins
 addgroup root audio
 apk add mesa-egl xf86-video-fbdev xf86-video-vesa dbus setxkbmap kbd xrandr xset xf86-video-modesetting 
 #xterm
