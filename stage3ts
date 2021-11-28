@@ -34,8 +34,8 @@ for i in seq 1 3; do
   /title:vcon \\
   /cert-ignore"
 
-  xfreerdp /u:u000 $ops /v:vcon \\
-  || xfreerdp /u:u000 $ops /v:vcon.magazindeneg.com:3393
+  xfreerdp /u:u000 \$ops /v:vcon \\
+  || xfreerdp /u:u000 \$ops /v:vcon.magazindeneg.com:3393
 done
 
 poweroff
