@@ -83,7 +83,7 @@ EndSection
 EOF
 
 cat << EOF > /root/.profile
-!/bin/ash
+#!/bin/ash
 ### start X server
 #exec startx
 EOF
