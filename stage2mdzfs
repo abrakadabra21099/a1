@@ -30,13 +30,13 @@ auto eth2
   iface eth2 inet dhcp
 #auto eth2
 #  iface eth2 inet manual
-#  up ip link set $IFACE up
-#  down ip link set $IFACE down
+#  up ip link set \$IFACE up
+#  down ip link set \$IFACE down
 
 auto eth3
   iface eth3 inet manual
-  up ip link set $IFACE up
-  down ip link set $IFACE down
+  up ip link set \$IFACE up
+  down ip link set \$IFACE down
 
 auto bond0
   iface bond0 inet manual
