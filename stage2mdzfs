@@ -202,7 +202,32 @@ service sshd restart
 apk add bridge bridge-utils bonding vlan zfs drbd-utils
 rc-update add zfs-import boot
 rc-update add local default
-apk -U upgrade
 
+cat > /etc/modprobe.d/zfs.conf <<'EOF'
+# RAM min cache 1GiB
+#options zfs zfs_arc_min=1073741824
+# RAM min cache 10GiB
+options zfs zfs_arc_min=10737418240
+
+
+# RAM max cache 7GiB
+#options zfs zfs_arc_max=7516192768
+# RAM max cache 300GiB
+options zfs zfs_arc_max=322122547200
+
+
+# включить кэширование поточных данных
+options zfs l2arc_noprefetch=0
+
+# максимальная скорость записи в L2ARC
+#options zfs l2arc_write_max=134217728
+#26214400
+
+# boost скорости.
+#options zfs l2arc_write_boost=134217728
+#52428800
+EOF
+
+apk -U upgrade
 lbu ci
 echo 'Stage #2: All done! Need run next stage #3.'
