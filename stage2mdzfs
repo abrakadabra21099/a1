@@ -172,7 +172,7 @@ PROXYOPTS="none"
 
 # Add a random mirror
 APKREPOSOPTS="http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/main
-#http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/community
+http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/community
 #http://mirror.yandex.ru/mirrors/alpine/edge/main
 #http://mirror.yandex.ru/mirrors/alpine/edge/community
 #http://mirror.yandex.ru/mirrors/alpine/edge/testing
@@ -199,8 +199,10 @@ setup-apkcache "$usb/cache"
 sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config || exit 1
 service sshd restart
 
-lbu ci
-apk add bridge bridge-utils bonding vlan
+apk add bridge bridge-utils bonding vlan zfs drbd-utils
+rc-update add zfs-import boot
+rc-update add local default
 apk -U upgrade
 
+lbu ci
 echo 'Stage #2: All done! Need run next stage #3.'
