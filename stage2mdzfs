@@ -199,9 +199,17 @@ setup-apkcache "$usb/cache"
 sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config || exit 1
 service sshd restart
 
-apk add bridge bridge-utils bonding vlan zfs zfs-udev drbd-utils xen xen-hypervisor xen-qemu seabios ovmf lsblk blkid bridge bridge-utils
+apk add bridge bridge-utils bonding vlan zfs zfs-udev drbd-utils xen xen-hypervisor xen-qemu seabios ovmf lsblk blkid bridge-utils
 rc-update add zfs-import boot
 rc-update add local default
+rc-update add xenconsoled
+rc-update add xendomains
+rc-update add xenqemu
+rc-update add xenstored
+
+grep -w xen-netback /etc/modules || echo xen-netback >> /etc/modules
+grep -w xen-blkback /etc/modules || echo xen-blkback >> /etc/modules
+grep -w tun /etc/modules || echo tun >> /etc/modules
 
 cat > /etc/modprobe.d/zfs.conf <<'EOF'
 # RAM min cache 1GiB
