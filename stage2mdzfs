@@ -199,13 +199,15 @@ setup-apkcache "$usb/cache"
 sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config || exit 1
 service sshd restart
 
-apk add bridge bridge-utils bonding vlan zfs zfs-udev drbd-utils xen xen-hypervisor xen-qemu seabios ovmf lsblk blkid bridge-utils rsync
-rc-update add zfs-import boot
+apk -U add bridge bridge-utils bonding vlan zfs zfs-udev drbd-utils xen xen-hypervisor xen-qemu seabios ovmf lsblk blkid bridge-utils rsync eudev
+# rc-update add udev default
+rc-update add zfs-import default
+# rc-update add zfs-mount default
 rc-update add local default
-rc-update add xenconsoled
-rc-update add xendomains
-rc-update add xenqemu
-rc-update add xenstored
+rc-update add xenconsoled default
+rc-update add xendomains default
+rc-update add xenqemu default
+rc-update add xenstored default
 
 grep -w xen-netback /etc/modules || echo xen-netback >> /etc/modules
 grep -w xen-blkback /etc/modules || echo xen-blkback >> /etc/modules
