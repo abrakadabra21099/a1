@@ -199,10 +199,12 @@ setup-apkcache "$usb/cache"
 sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config || exit 1
 service sshd restart
 
-apk -U add bridge bridge-utils bonding vlan zfs zfs-udev drbd-utils xen xen-hypervisor xen-qemu seabios ovmf lsblk blkid bridge-utils rsync eudev
+apk -U add bridge bridge-utils bonding vlan zfs zfs-udev drbd-utils xen xen-hypervisor xen-qemu seabios ovmf lsblk blkid bridge-utils rsync fio
+# eudev
 # rc-update add udev default
+# setup-udev
 rc-update add zfs-import default
-# rc-update add zfs-mount default
+rc-update add zfs-mount default
 rc-update add local default
 rc-update add xenconsoled default
 rc-update add xendomains default
