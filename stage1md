@@ -8,7 +8,9 @@ fi
 dev=${dev:-sda}
 echo "Setup into device: $dev"
 
-dd bs=1M if=/dev/zero of=/dev/$dev count=5
+apk -U add sfdisk
+sfdisk --wipe /dev/$dev
+#dd bs=1M if=/dev/zero of=/dev/$dev count=5
 
 #if=$(ip a|awk -F:\  \{print\ \$2\}|sed /^$/d|grep -v lo|head -n1)
 #if={if:-eth0}
@@ -24,12 +26,13 @@ KEYMAPOPTS="us us"
 HOSTNAMEOPTS="-n stage1"
 
 # Contents of /etc/network/interfaces
+IF="$(ip r get 8.8.8.8 | awk '{print $5}')"
 INTERFACESOPTS="# The loopback network interface
 auto lo
 iface lo inet loopback
 
-auto eth0
-  iface eth0 inet dhcp
+auto $IF
+  iface $IF inet dhcp
 "
 
 # Search domain of example.com, Google public nameserver
