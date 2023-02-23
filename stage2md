@@ -26,22 +26,22 @@ auto lo
 iface lo inet loopback
 
 # 1 gbit uplink, LACP
-auto eth0
-  iface eth0 inet dhcp
-#auto eth0
-#  iface eth0 inet manual
-#  up ip link set $IFACE up
-#  down ip link set $IFACE down
+auto eth2
+  iface eth2 inet manual
+  up ip link set \$IFACE up
+  down ip link set \$IFACE down
 
-auto eth1
-  iface eth1 inet manual
-  up ip link set $IFACE up
-  down ip link set $IFACE down
+auto eth3
+  iface eth3 inet dhcp
+#auto eth3
+#  iface eth3 inet manual
+#  up ip link set \$IFACE up
+#  down ip link set \$IFACE down
 
 auto bond0
   iface bond0 inet manual
-  bond-slaves eth1
-#  bond-slaves eth0 eth1
+  bond-slaves eth2
+#  bond-slaves eth2 eth3
   bond_mode 802.3ad
   bond_miimon 100
   bond_downdelay 200
@@ -172,7 +172,7 @@ PROXYOPTS="none"
 
 # Add a random mirror
 APKREPOSOPTS="http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/main
-#http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/community
+http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/community
 #http://mirror.yandex.ru/mirrors/alpine/edge/main
 #http://mirror.yandex.ru/mirrors/alpine/edge/community
 #http://mirror.yandex.ru/mirrors/alpine/edge/testing

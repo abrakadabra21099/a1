@@ -13,7 +13,7 @@ cat > answers <<EOF
 KEYMAPOPTS="us us"
 
 # Set hostname to alpine-test
-HOSTNAMEOPTS="-n xeno0"
+HOSTNAMEOPTS="-n xeno1"
 
 # Contents of /etc/network/interfaces
 INTERFACESOPTS='# This file describes the network interfaces available on your system
@@ -27,20 +27,20 @@ iface lo inet loopback
 
 # 1 gbit uplink, LACP
 auto eth2
-  iface eth2 inet dhcp
-#auto eth2
-#  iface eth2 inet manual
-#  up ip link set \$IFACE up
-#  down ip link set \$IFACE down
-
-auto eth3
-  iface eth3 inet manual
+  iface eth2 inet manual
   up ip link set \$IFACE up
   down ip link set \$IFACE down
 
+auto eth3
+  iface eth3 inet dhcp
+#auto eth3
+#  iface eth3 inet manual
+#  up ip link set \$IFACE up
+#  down ip link set \$IFACE down
+
 auto bond0
   iface bond0 inet manual
-  bond-slaves eth3
+  bond-slaves eth2
 #  bond-slaves eth2 eth3
   bond_mode 802.3ad
   bond_miimon 100
@@ -67,7 +67,7 @@ auto br4000
 
 auto br1
   iface br1 inet static
-  address 192.168.0.23
+  address 192.168.0.7
   netmask 255.255.255.0
 #  broadcast 192.168.0.255
   gateway 192.168.0.1
@@ -131,7 +131,7 @@ auto br10
 
 auto br40
   iface br40 inet static
-  address 192.168.40.7
+  address 192.168.40.5
   netmask 255.255.255.0
 #  gateway 192.168.40.254
 #  broadcast 192.168.40.255
@@ -217,7 +217,7 @@ grep -w tun /etc/modules || echo tun >> /etc/modules
 
 sed -i 's%^DEFAULT lts$%DEFAULT xen\n\nLABEL xen\nMENU LABEL Xen/Linux lts\nKERNEL /boot/syslinux/mboot.c32\nAPPEND /boot/xen.gz dom0_vcpus_pin dom0_max_vcpus=4 --- /boot/vmlinuz-lts modules=loop,squashfs,sd-mod,usb-storage quiet nomodeset --- /boot/initramfs-lts%' "$usb"/boot/syslinux/syslinux.cfg
 
-cp -a /boot/xen* /media/sdc1/boot/
+cp -a /boot/xen* "$usb"/boot/
 
 cat > /etc/modprobe.d/zfs.conf <<'EOF'
 # RAM min cache 1GiB
@@ -228,8 +228,10 @@ options zfs zfs_arc_min=10737418240
 
 # RAM max cache 7GiB
 #options zfs zfs_arc_max=7516192768
+# RAM max cache 40GiB
+options zfs zfs_arc_max=42949672960
 # RAM max cache 300GiB
-options zfs zfs_arc_max=322122547200
+#options zfs zfs_arc_max=322122547200
 
 
 # включить кэширование поточных данных
