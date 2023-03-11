@@ -110,7 +110,8 @@ extlinux --install /media/target || extlinux --update /media/target || exit 4
 
 cdrom="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
 #cp -t /media/target -a $cdrom/.alpine-release $cdrom/* ~/a1
-cp -t /media/target -a $cdrom/.alpine-release $cdrom/* "$(dirname "$0")"
+#cp -t /media/target -a $cdrom/.alpine-release $cdrom/* "$(dirname "$0")"
+cp -a $cdrom/.alpine-release $cdrom/* "$(dirname "$0")" /media/target
 umount /media/target
 
 echo 'Stage #1: All done! Need reboot and run next stage #2.'
