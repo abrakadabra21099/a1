@@ -204,9 +204,9 @@ options zfs zfs_arc_min=10737418240
 # RAM max cache 40GiB
 #options zfs zfs_arc_max=42949672960
 # RAM max cache 300GiB
-#options zfs zfs_arc_max=322122547200
+options zfs zfs_arc_max=322122547200
 # 400GB - max
-options zfs zfs_arc_max=429496729600
+#options zfs zfs_arc_max=429496729600
 
 
 # включить кэширование поточных данных
