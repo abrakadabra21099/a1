@@ -190,7 +190,9 @@ grep -w tun /etc/modules || echo tun >> /etc/modules
 
 sed -i 's%^DEFAULT lts$%DEFAULT xen\n\nLABEL xen\nMENU LABEL Xen/Linux lts\nKERNEL /boot/syslinux/mboot.c32\nAPPEND /boot/xen.gz dom0_vcpus_pin dom0_max_vcpus=4 dom0_mem=350G,max:350G --- /boot/vmlinuz-lts modules=loop,squashfs,sd-mod,usb-storage quiet nomodeset --- /boot/initramfs-lts%' "$usb"/boot/syslinux/syslinux.cfg
 
+mount -o remount,rw "$usb"
 cp -a /boot/xen* "$usb"/boot/
+mount -o remount,ro "$usb"
 
 cat > /etc/modprobe.d/zfs.conf <<'EOF'
 # RAM min cache 1GiB
