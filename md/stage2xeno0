@@ -27,20 +27,19 @@ iface lo inet loopback
 
 # 1 gbit uplink, LACP
 auto eth2
-  iface eth2 inet manual
-  up ip link set \$IFACE up
-  down ip link set \$IFACE down
-
-auto eth3
-  iface eth3 inet dhcp
-#auto eth3
-#  iface eth3 inet manual
+  iface eth2 inet dhcp
+#  iface eth2 inet manual
 #  up ip link set \$IFACE up
 #  down ip link set \$IFACE down
 
+auto eth3
+  iface eth3 inet manual
+  up ip link set \$IFACE up
+  down ip link set \$IFACE down
+
 auto bond0
   iface bond0 inet manual
-  bond-slaves eth2
+  bond-slaves eth3
 #  bond-slaves eth2 eth3
   bond_mode 802.3ad
   bond_miimon 100
@@ -56,7 +55,8 @@ auto br4000
 
 auto br1
   iface br1 inet static
-  address 192.168.0.23
+#  address 192.168.0.23
+  address 192.168.0.200
   netmask 255.255.255.0
 #  broadcast 192.168.0.255
   gateway 192.168.0.9
