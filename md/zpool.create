@@ -1,0 +1,2 @@
+zpool create -o ashift=12 -O compression=lz4 -f vm raidz /dev/disk/by-id/scsi-3600605b00b51e7452b9f26d143e6f3f0 /dev/disk/by-id/scsi-3600605b00b51e7452a790f2
+356bed350 /dev/disk/by-id/scsi-3600605b00b51e7452b9f270346ec208d cache /dev/disk/by-id/nvme-XPG_SPECTRIX_S40G_2M202L19DDCC
