@@ -58,8 +58,7 @@ auto br1
 #  address 192.168.0.23
   address 192.168.0.200
   netmask 255.255.255.0
-#  broadcast 192.168.0.255
-  gateway 192.168.0.9
+#  gateway 192.168.0.9
   hostname xeno1
   dns-nameservers 192.168.0.1
   dns-search magazindeneg.com
