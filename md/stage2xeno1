@@ -1,0 +1,245 @@
+#!/bin/ash
+
+usb="$(df | grep /media/ | grep -v sr0 | head -n1 | awk \{print\ \$6\})"
+#dsk="$(df | grep /media/ | head -n1 | awk \{print\ \$1\} | sed s%1\$%%)"
+
+#if=$(ip a|awk -F:\  \{print\ \$2\}|sed /^$/d|grep -v lo|head -n1)
+
+cat > answers <<EOF
+# Example answer file for setup-alpine script
+# If you don't want to use a certain option, then comment it out
+
+# Use US layout with US variant
+KEYMAPOPTS="us us"
+
+# Set hostname to alpine-test
+HOSTNAMEOPTS="-n xeno1"
+
+# Contents of /etc/network/interfaces
+INTERFACESOPTS='# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+#source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# 1 gbit uplink, LACP
+auto eth2
+  iface eth2 inet manual
+  up ip link set \$IFACE up
+  down ip link set \$IFACE down
+
+auto eth3
+  iface eth3 inet dhcp
+#auto eth3
+#  iface eth3 inet manual
+#  up ip link set \$IFACE up
+#  down ip link set \$IFACE down
+
+auto bond0
+  iface bond0 inet manual
+  bond-slaves eth2
+#  bond-slaves eth2 eth3
+  bond_mode 802.3ad
+  bond_miimon 100
+  bond_downdelay 200
+  bond_updelay 200
+  bond_xmit_hash_policy layer2+3
+
+auto br4000
+  iface br4000 inet manual
+  bridge_ports bond0
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br1
+  iface br1 inet static
+  address 192.168.0.7
+  netmask 255.255.255.0
+#  broadcast 192.168.0.255
+  gateway 192.168.0.9
+  hostname xeno1
+  dns-nameservers 192.168.0.1
+  dns-search magazindeneg.com
+  bridge_ports bond0.1
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br2
+  iface br2 inet manual
+  bridge_ports bond0.2
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br3
+  iface br3 inet manual
+  bridge_ports bond0.3
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br4
+  iface br4 inet manual
+  bridge_ports bond0.4
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br5
+  iface br5 inet manual
+  bridge_ports bond0.5
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br10
+  iface br10 inet manual
+  bridge_ports bond0.10
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br40
+  iface br40 inet static
+  address 192.168.40.5
+  netmask 255.255.255.0
+#  gateway 192.168.40.254
+#  broadcast 192.168.40.255
+  bridge_ports bond0.40
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br50
+  iface br50 inet manual
+  bridge_ports bond0.50
+  bridge_stp off
+  bridge_fd 0.0
+
+auto brnone
+  iface brnone inet manual
+  bridge_ports none
+  bridge_stp off
+  bridge_fd 0.0
+'
+
+# Search domain of example.com, Google public nameserver
+#DNSOPTS="-d local  8.8.4.4  8.8.8.8"
+#DNSOPTS="-d krit.pro 10.118.131.100 10.118.145.13"
+DNSOPTS="-d magazindeneg.com 192.168.0.1"
+
+# Set timezone to UTC
+TIMEZONEOPTS="-z Europe/Samara"
+
+# set http/ftp proxy
+PROXYOPTS="none"
+
+# Add a random mirror
+APKREPOSOPTS="http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/main
+http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/community
+#http://mirror.yandex.ru/mirrors/alpine/edge/main
+#http://mirror.yandex.ru/mirrors/alpine/edge/community
+#http://mirror.yandex.ru/mirrors/alpine/edge/testing
+"
+
+# Install Openssh
+SSHDOPTS="-c openssh"
+
+# Use openntpd
+NTPOPTS="-c chrony"
+
+# Use /dev/sda as a data disk
+DISKOPTS="-m data none"
+
+# Setup in /media/sdb1
+LBUOPTS="$usb"
+APKCACHEOPTS="$usb/cache"
+EOF
+
+setup-alpine -f answers
+setup-lbu "$usb"
+setup-apkcache "$usb/cache"
+
+sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config || exit 1
+service sshd restart
+
+apk -U add bridge bridge-utils bonding vlan zfs zfs-udev drbd-utils xen xen-hypervisor xen-qemu seabios ovmf lsblk blkid bridge-utils rsync sgdisk fio lsscsi python3 qemu-system-x86_64 qemu-system-i386 atop
+# eudev
+# rc-update add udev default
+# setup-udev
+rc-update add zfs-import default
+rc-update add zfs-mount default
+rc-update add local default
+rc-update add xenconsoled default
+rc-update add xendomains default
+rc-update add xenqemu default
+rc-update add xenstored default
+rc-update add atop default
+
+cat > /etc/default/atop <<'EOF'
+#Интервал через который делается снимок нагрузки сервера, в секундах.
+INTERVAL=600
+
+#Путь до логов atop.
+LOGPATH="/var/log/atop"
+
+#хранить бэкапы за 10 дней.
+keepdays = 3
+EOF
+
+grep -w xen-netback /etc/modules || echo xen-netback >> /etc/modules
+grep -w xen-blkback /etc/modules || echo xen-blkback >> /etc/modules
+grep -w tun /etc/modules || echo tun >> /etc/modules
+
+sed -i 's%^DEFAULT lts$%DEFAULT xen\n\nLABEL xen\nMENU LABEL Xen/Linux lts\nKERNEL /boot/syslinux/mboot.c32\nAPPEND /boot/xen.gz dom0_vcpus_pin dom0_max_vcpus=4 dom0_mem=50G,max:50G --- /boot/vmlinuz-lts modules=loop,squashfs,sd-mod,usb-storage quiet nomodeset --- /boot/initramfs-lts%' "$usb"/boot/syslinux/syslinux.cfg
+
+cp -a /boot/xen* "$usb"/boot/
+
+cat > /etc/modprobe.d/zfs.conf <<'EOF'
+# RAM min cache 1GiB
+#options zfs zfs_arc_min=1073741824
+# RAM min cache 10GiB
+options zfs zfs_arc_min=10737418240
+
+
+# RAM max cache 7GiB
+#options zfs zfs_arc_max=7516192768
+# RAM max cache 40GiB
+options zfs zfs_arc_max=42949672960
+# RAM max cache 300GiB
+#options zfs zfs_arc_max=322122547200
+# 400GB - max
+#options zfs zfs_arc_max=429496729600
+
+
+# включить кэширование поточных данных
+options zfs l2arc_noprefetch=0
+
+# максимальная скорость записи в L2ARC
+#options zfs l2arc_write_max=134217728
+#26214400
+
+# boost скорости.
+#options zfs l2arc_write_boost=134217728
+#52428800
+EOF
+cat > /etc/hosts <<'EOF'
+127.0.0.1       localhost.localdomain localhost
+::1             localhost localhost.localdomain
+
+192.168.40.1    xeno xeno.magazindeneg.com
+192.168.40.2    xeno2 xeno2.magazindeneg.com
+192.168.40.3    xeno3 xeno3.magazindeneg.com
+192.168.40.4    hkeys hkeys.magazindeneg.com
+192.168.0.7     xeno1.magazindeneg.com xeno1
+192.168.40.6    vadm vadm.magazindeneg.com
+192.168.40.7    xeno0 xeno0.magazindeneg.com
+192.168.40.254  vpn2 vpn2.magazindeneg.com
+192.168.0.47    nas-backup3 nas-backup3.magazindeneg.com
+192.168.0.48    nas-backup2 nas-backup2.magazindeneg.com
+
+# san network
+10.202.0.100    san0
+10.202.0.101    san1
+EOF
+
+apk -U upgrade
+lbu ci
+echo 'Stage #2: All done! Need run next stage #3.'

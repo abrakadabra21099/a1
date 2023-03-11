@@ -1,0 +1,135 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+#source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# 10 gbit uplink, LACP
+auto eth0
+  iface eth0 inet manual
+  up ip link set $IFACE up mtu 9000
+  down ip link set $IFACE down
+
+auto eth1
+  iface eth1 inet manual
+  up ip link set $IFACE up mtu 9000
+  down ip link set $IFACE down
+
+# 1 gbit uplink, LACP
+auto eth2
+  iface eth2 inet manual
+  up ip link set $IFACE up
+  down ip link set $IFACE down
+
+#auto eth3
+#  iface eth3 inet dhcp
+auto eth3
+  iface eth3 inet manual
+  up ip link set $IFACE up
+  down ip link set $IFACE down
+
+auto bond0
+  iface bond0 inet manual
+#  bond-slaves eth2
+  bond-slaves eth2 eth3
+  bond_mode 802.3ad
+  bond_miimon 100
+  bond_downdelay 200
+  bond_updelay 200
+  bond_xmit_hash_policy layer2+3
+
+auto bond1
+  iface bond1 inet manual
+  up ip link set $IFACE up mtu 9000
+#  mtu 9000
+  bond-slaves eth0 eth1
+  bond_mode 802.3ad
+  bond_lacp-rate fast
+  bond_miimon 100
+  bond_downdelay 200
+  bond_updelay 200
+  bond_xmit_hash_policy layer3+4
+
+auto san
+  iface san inet static
+  address 10.202.0.101
+  netmask 255.255.255.0
+  mtu 9000
+  bridge_ports bond1
+  bridge_stp off
+  bridge_fd 0.0
+
+
+auto br4000
+  iface br4000 inet manual
+  bridge_ports bond0
+  bridge_stp off
+  bridge_fd 0.0
+
+
+auto br1
+  iface br1 inet static
+  address 192.168.0.7
+  netmask 255.255.255.0
+  gateway 192.168.0.10
+  hostname xeno0
+  dns-nameservers 192.168.0.1
+  dns-search magazindeneg.com
+  bridge_ports bond0.1
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br2
+  iface br2 inet manual
+  bridge_ports bond0.2
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br3
+  iface br3 inet manual
+  bridge_ports bond0.3
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br4
+  iface br4 inet manual
+  bridge_ports bond0.4
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br5
+  iface br5 inet manual
+  bridge_ports bond0.5
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br10
+  iface br10 inet manual
+  bridge_ports bond0.10
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br40
+  iface br40 inet static
+  address 192.168.40.5
+  netmask 255.255.255.0
+#  gateway 192.168.40.254
+#  broadcast 192.168.40.255
+  bridge_ports bond0.40
+  bridge_stp off
+  bridge_fd 0.0
+
+auto br50
+  iface br50 inet manual
+  bridge_ports bond0.50
+  bridge_stp off
+  bridge_fd 0.0
+
+auto brnone
+  iface brnone inet manual
+  bridge_ports none
+  bridge_stp off
+  bridge_fd 0.0

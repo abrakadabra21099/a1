@@ -1,0 +1,22 @@
+2: eno1: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc mq master bond0 state UP group default qlen 1000
+    link/ether 9e:c1:46:e6:10:08 brd ff:ff:ff:ff:ff:ff permaddr 3c:ec:ef:66:b4:f8
+    altname enp28s0f0
+3: eno2: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc mq master bond0 state UP group default qlen 1000
+    link/ether 9e:c1:46:e6:10:08 brd ff:ff:ff:ff:ff:ff permaddr 3c:ec:ef:66:b4:f9
+    altname enp28s0f1
+4: enp216s0f0: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 9000 qdisc mq master bond1 state UP group default qlen 1000
+    link/ether b6:2e:7f:31:89:72 brd ff:ff:ff:ff:ff:ff permaddr 6c:b3:11:0a:d7:d4
+5: enp216s0f1: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 9000 qdisc mq master bond1 state UP group default qlen 1000
+    link/ether b6:2e:7f:31:89:72 brd ff:ff:ff:ff:ff:ff permaddr 6c:b3:11:0a:d7:d6
+6: bond0: <BROADCAST,MULTICAST,MASTER,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 9e:c1:46:e6:10:08 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::9cc1:46ff:fee6:1008/64 scope link 
+       valid_lft forever preferred_lft forever
+7: bond1: <BROADCAST,MULTICAST,MASTER,UP,LOWER_UP> mtu 9000 qdisc noqueue master san state UP group default qlen 1000
+    link/ether b6:2e:7f:31:89:72 brd ff:ff:ff:ff:ff:ff
+8: br1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 32:54:cc:f2:8b:93 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.23/24 brd 192.168.0.255 scope global br1
+       valid_lft forever preferred_lft forever
+    inet6 fe80::3054:ccff:fef2:8b93/64 scope link 
+       valid_lft forever preferred_lft forever
