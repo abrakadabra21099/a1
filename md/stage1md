@@ -31,8 +31,8 @@ INTERFACESOPTS="# The loopback network interface
 auto lo
 iface lo inet loopback
 
-auto $IF
-  iface $IF inet dhcp
+auto \$IF
+  iface \$IF inet dhcp
 "
 
 # Search domain of example.com, Google public nameserver
