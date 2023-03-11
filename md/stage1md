@@ -8,8 +8,8 @@ fi
 dev=${dev:-sda}
 echo "Setup into device: $dev"
 
-apk -U add sfdisk
-sfdisk --wipe /dev/$dev
+apk -U add sfdisk sgdisk
+sgdisk --wipe /dev/$dev
 #dd bs=1M if=/dev/zero of=/dev/$dev count=5
 
 #if=$(ip a|awk -F:\  \{print\ \$2\}|sed /^$/d|grep -v lo|head -n1)
