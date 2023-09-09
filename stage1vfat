@@ -5,11 +5,16 @@ else
   echo "Please input target block device. [sda]"
   read dev
 fi
+PARTPREFIX=1
+#PARTPREFIX=p1
 dev=${dev:-sda}
 echo "Setup into device: $dev"
+echo "root:abc" | chpasswd
 
-dd bs=1M if=/dev/zero of=/dev/$dev count=5
-
+#dd bs=1M if=/dev/zero of=/dev/$dev count=5
+apk add sgdisk
+sgdisk --zap-all /dev/$dev
+mdev -s
 if=$(ip a|awk -F:\  \{print\ \$2\}|sed /^$/d|grep -v lo|head -n1)
 #if={if:-eth0}
 
@@ -22,6 +27,9 @@ KEYMAPOPTS="us us"
 
 # Set hostname to alpine-test
 HOSTNAMEOPTS="-n stage1"
+
+# Set device manager to mdev
+DEVDOPTS="mdev"
 
 # Contents of /etc/network/interfaces
 INTERFACESOPTS="# The loopback network interface
@@ -49,7 +57,7 @@ PROXYOPTS="none"
 
 # Add a random mirror
 APKREPOSOPTS="http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/main
-#http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/community
+http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/community
 #http://mirror.yandex.ru/mirrors/alpine/edge/main
 #http://mirror.yandex.ru/mirrors/alpine/edge/community
 #http://mirror.yandex.ru/mirrors/alpine/edge/testing
@@ -65,8 +73,8 @@ NTPOPTS="-c chrony"
 DISKOPTS="-m data none"
 
 # Setup in /media/sdb1
-LBUOPTS="/media/${dev}1"
-APKCACHEOPTS="/media/${dev}1/cache"
+LBUOPTS="/media/${dev}${PARTPREFIX}"
+APKCACHEOPTS="/media/${dev}${PARTPREFIX}/cache"
 EOF
 mkdir -p /media/target
 setup-alpine -f answers
@@ -83,6 +91,9 @@ sector-size: 512
 #2GB vfat
 /dev/none : start=          32, size=     4194304, type=c, bootable
 
+#0.5GB ext3
+#/dev/none : start=          32, size=     1048576, type=83, bootable
+
 #1GB ext3
 #/dev/none : start=          32, size=     2097152, type=83, bootable
 
@@ -96,21 +107,22 @@ sector-size: 512
 #/dev/none : start=          32, size=     18874368, type=83, bootable
 EOF
 
-#mkfs.ext3 -F /dev/${dev}1 || exit 2
-mkdosfs -F32 /dev/${dev}1 || exit 2
+#mkfs.ext3 -F /dev/${dev}${PARTPREFIX} || exit 2
+mkdosfs -F32 /dev/${dev}${PARTPREFIX} || exit 2
 
 dd if=/usr/share/syslinux/mbr.bin of=/dev/$dev conv=notrunc
 # Only for vfat need.
-syslinux /dev/${dev}1
+syslinux /dev/${dev}${PARTPREFIX}
 
-#mount -t ext3 /dev/${dev}1 /media/target || exit 3
-mount -t vfat /dev/${dev}1 /media/target || exit 3
+#mount -t ext3 /dev/${dev}${PARTPREFIX} /media/target || exit 3
+mount -t vfat /dev/${dev}${PARTPREFIX} /media/target || exit 3
 
 # Only for ext3 need.
 #extlinux --install /media/target || extlinux --update /media/target || exit 4
 
 cdrom="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
-cp -a $cdrom/.alpine-release $cdrom/* "$(dirname "$0")/" /media/target
+#cp -a $cdrom/.alpine-release $cdrom/* "$(dirname "$0")/" /media/target
+cp -a $cdrom/.alpine-release $cdrom/* "/a1" /media/target
 umount /media/target
 
 echo 'Stage #1: All done! Need reboot and run next stage #2.'
