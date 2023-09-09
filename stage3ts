@@ -1,7 +1,7 @@
 #!/bin/ash
 setup-xorg-base
 
-apk add chromium firefox-esr alsa-utils alsa-utils-doc alsa-lib alsaconf freerdp freerdp-plugins
+apk add chromium firefox-esr alsa-utils alsa-utils-doc alsa-lib alsaconf freerdp freerdp-plugins cloud-utils-growpart
 addgroup root audio
 sed -i 's%^defaults.ctl.card 0$%defaults.ctl.card 1%' /usr/share/alsa/alsa.conf
 sed -i 's%^defaults.pcm.card 0$%defaults.pcm.card 1%' /usr/share/alsa/alsa.conf

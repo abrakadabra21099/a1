@@ -1,6 +1,20 @@
 #!/bin/ash
 sed -i '/\/v.*\/community$/s%^#%%' /etc/apk/repositories
-apk -U add docker docker-compose e2fsprogs-extra gptfdisk cfdisk lvm2 thin-provisioning-tools bridge bridge-utils nano screen qemu-guest-agent || exit 1
+apk -U add \
+docker \
+docker-compose \
+e2fsprogs-extra \
+gptfdisk \
+cfdisk \
+lvm2 \
+thin-provisioning-tools \
+bridge \
+bridge-utils \
+nano \
+screen \
+qemu-guest-agent \
+cloud-utils-growpart \
+|| exit 1
 #df /var/lib/docker >/dev/null || exit 2
 #apk -U add docker docker-compose || exit 3
 
