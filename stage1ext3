@@ -107,8 +107,11 @@ EOF
 
 mkfs.ext3 -F /dev/${dev}${PARTPREFIX} || exit 2
 #mkdosfs -F32 /dev/${dev}${PARTPREFIX} || exit 2
+sync
+mdev -s
 
 dd if=/usr/share/syslinux/mbr.bin of=/dev/$dev conv=notrunc
+sync
 mdev -s
 # Only for vfat need.
 #syslinux /dev/${dev}${PARTPREFIX}
