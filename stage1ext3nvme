@@ -75,7 +75,7 @@ DISKOPTS="-m data none"
 
 # Setup in /media/sdb1
 LBUOPTS="/media/${dev}${PARTPREFIX}"
-APKCACHEOPTS="/media/${dev}${PARTPREFIX}/cache"
+APKCACHEOPTS="${dev}${PARTPREFIX}/cache"
 EOF
 mkdir -p /media/target
 setup-alpine -f answers
