@@ -12,7 +12,7 @@ echo "Setup into device: $dev"
 echo "root:abc" | chpasswd
 
 #dd bs=1M if=/dev/zero of=/dev/$dev count=5
-apk add sgdisk
+apk add sgdisk util-linux
 # sgdisk --zap-all /dev/$dev
 wipefs -a /dev/$dev
 mdev -s
