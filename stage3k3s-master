@@ -1,0 +1,18 @@
+#!/bin/ash
+
+apk add --no-cache \
+  pwgen \
+  cni-plugins \
+  curl
+
+K3S_TOKEN=${K3S_TOKEN:-$(pwgen -sB 64 1)}
+
+#curl -sfL https://get.k3s.io | sudo sh -
+curl -sfL https://get.k3s.io | K3S_TOKEN=${K3S_TOKEN} sh -s - server \
+    --cluster-init
+
+rc-status
+echo "export K3S_TOKEN=$K3S_TOKEN"
+
+hostname -f |\
+  sed s%^%export\ K3S_URL=https://%\;s%$%:6443%

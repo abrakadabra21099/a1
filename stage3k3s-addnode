@@ -1,0 +1,18 @@
+#!/bin/ash
+
+[ -n "$K3S_TOKEN" ] &&
+  echo 'Need "export\ K3S_TOKEN=XXX". Where XXX is token from stage3k3s-master' &&
+  exit 1
+
+[ -n "$K3S_URL" ] &&
+  echo 'Need "export K3S_URL=https://myserver:6443". Where myserver is hostname or ip address from stage3k3s-master' &&
+  exit 2
+
+apk add --no-cache \
+  cni-plugins  \
+  curl
+
+#curl -sfL https://get.k3s.io | K3S_URL=${K3S_URL} K3S_TOKEN=${K3S_TOKEN} sh -s - server
+curl -sfL https://get.k3s.io | K3S_TOKEN=${K3S_TOKEN} sh -s - server \
+    --server "$K3S_URL"
+    
