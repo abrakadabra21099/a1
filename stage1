@@ -96,7 +96,7 @@ sector-size: 512
 /dev/none : start=          32, size=     1048576, type=83, bootable
 
 #1GB ext3
-#/dev/none : start=          32, size=     2097152, type=83, bootable
+#/dev/none : start=          32, size=     2097120, type=83, bootable
 
 #2GB ext3
 #/dev/none : start=          32, size=     4194304, type=83, bootable
@@ -110,8 +110,12 @@ EOF
 
 mkfs.ext3 -F /dev/${dev}${PARTPREFIX} || exit 2
 #mkdosfs -F32 /dev/${dev}${PARTPREFIX} || exit 2
+sync
+mdev -s
 
 dd if=/usr/share/syslinux/mbr.bin of=/dev/$dev conv=notrunc
+sync
+mdev -s
 # Only for vfat need.
 #syslinux /dev/${dev}${PARTPREFIX}
 
