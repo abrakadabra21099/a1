@@ -93,13 +93,13 @@ sector-size: 512
 #/dev/none : start=          32, size=     4194304, type=c, bootable
 
 #0.5GB ext3
-/dev/none : start=          32, size=     1048576, type=83, bootable
+#/dev/none : start=          32, size=     1048576, type=83, bootable
 
 #1GB ext3
 #/dev/none : start=          32, size=     2097120, type=83, bootable
 
 #2GB ext3
-#/dev/none : start=          32, size=     4194304, type=83, bootable
+/dev/none : start=          32, size=     4194304, type=83, bootable
 
 #3GB ext3
 #/dev/none : start=          32, size=     6291456, type=83, bootable
