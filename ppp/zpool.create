@@ -1,0 +1,12 @@
+# n5
+zpool create \
+-o ashift=13 \
+-O compression=lz4 \
+-f vm \
+raidz \
+/dev/disk/by-id/wwn-0x600605b00b51e74530ba0d46234fc302 \
+/dev/disk/by-id/wwn-0x600605b00b51e74530ba0db92a308f4c \
+/dev/disk/by-id/wwn-0x600605b00b51e74530ba0df22d966a1e \
+/dev/disk/by-id/wwn-0x600605b00b51e74530ba0e032e9c21d7 \
+cache \
+/dev/disk/by-id/nvme-eui.0000000000000000707c186a6e99b5c5

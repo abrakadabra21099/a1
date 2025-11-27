@@ -223,7 +223,7 @@ cat > /etc/modprobe.d/zfs.conf <<'EOF'
 # RAM min cache 1GiB
 #options zfs zfs_arc_min=1073741824
 # RAM min cache 10GiB
-options zfs zfs_arc_min=10737418240
+#options zfs zfs_arc_min=10737418240
 
 
 # RAM max cache 7GiB
@@ -235,7 +235,7 @@ options zfs zfs_arc_max=42949672960
 
 
 # включить кэширование поточных данных
-options zfs l2arc_noprefetch=0
+#options zfs l2arc_noprefetch=0
 
 # максимальная скорость записи в L2ARC
 #options zfs l2arc_write_max=134217728
