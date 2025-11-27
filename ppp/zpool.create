@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # n5
 zpool create \
 -o ashift=13 \
