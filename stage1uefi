@@ -1,0 +1,280 @@
+
+# manual steps
+setup-interfaces -ra
+echo root:123 | chpasswd
+setup-sshd # [enter], yes, [enter]
+
+#
+setup-apkrepos http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/main \
+http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/community
+apk update
+
+modprobe vfat
+apk add parted dosfstools wipefs nano git syslinux gummiboot lsblk
+wipefs -a /dev/nvme0n1 /dev/nvme1n1 /dev/nvme2n1
+
+parted /dev/nvme0n1 mklabel gpt
+parted /dev/nvme0n1 mkpart ESP fat32 1MiB 5GiB
+parted /dev/nvme0n1 set 1 boot on
+
+parted /dev/nvme1n1 mklabel gpt
+parted /dev/nvme1n1 mkpart ESP fat32 1MiB 5GiB
+# parted /dev/nvme1n1 set 1 boot on
+
+parted /dev/nvme2n1 mklabel gpt
+parted /dev/nvme2n1 mkpart ESP fat32 1MiB 5GiB
+# parted /dev/nvme2n1 set 1 boot on
+
+mkfs.vfat /dev/nvme0n1p1
+# mkfs.vfat /dev/nvme1n1p1
+# mkfs.vfat /dev/nvme2n1p1
+
+# setup-bootable /dev/sda /dev/nvme2n1p1
+# setup-bootable /dev/sda /dev/nvme1n1p1
+setup-bootable /dev/sda /dev/nvme0n1p1
+
+mount -t vfat /dev/nvme0n1p1 /media/nvme0n1p1
+# mount -t vfat /dev/nvme1n1p1 /media/nvme1n1p1
+# mount -t vfat /dev/nvme2n1p1 /media/nvme2n1p1
+
+mkdir -p /media/nvme0n1p1/EFI/boot /media/nvme0n1p1/loader/entries
+# mkdir -p /media/nvme1n1p1/EFI/boot /media/nvme1n1p1/loader/entries
+# mkdir -p /media/nvme2n1p1/EFI/boot /media/nvme2n1p1/loader/entries
+
+cp /usr/lib/gummiboot/gummibootx64.efi /media/nvme0n1p1/EFI/boot/bootx64.efi
+# cp /usr/lib/gummiboot/gummibootx64.efi /media/nvme1n1p1/EFI/boot/bootx64.efi
+# cp /usr/lib/gummiboot/gummibootx64.efi /media/nvme2n1p1/EFI/boot/bootx64.efi
+
+cat <<EOF> /media/nvme0n1p1/loader/entries/linux-lts.conf
+linux /boot/vmlinuz-lts
+initrd /boot/initramfs-lts
+options modules=loop,squashfs,sd-mod,usb-storage quiet nomodeset
+EOF
+
+cat <<EOF> /media/nvme0n1p1/loader/entries/xen.conf
+efi /boot/xen.efi
+EOF
+
+cat <<EOF> /media/nvme0n1p1/loader/loader.conf
+default linux-lts
+timeout 3
+EOF
+
+# cp /media/nvme0n1p1/loader/entries/linux-lts.conf \
+# /media/nvme0n1p1/loader/entries/xen.conf \
+# /media/nvme1n1p1/loader/entries/
+
+# cp /media/nvme0n1p1/loader/entries/linux-lts.conf \
+# /media/nvme0n1p1/loader/entries/xen.conf \
+# /media/nvme2n1p1/loader/entries/
+
+# cp /media/nvme0n1p1/loader/loader.conf \
+# /media/nvme1n1p1/loader/
+
+# cp /media/nvme0n1p1/loader/loader.conf \
+# /media/nvme2n1p1/loader/
+
+
+
+
+reboot
+
+# manual steps
+setup-interfaces -ra
+echo root:123 | chpasswd
+setup-sshd # [enter], yes, [enter]
+
+if=$(ip r get 1.0.0.1 | awk \{print\ \$5\})
+usb=$(df | grep /media/ | grep -v sr0 | head -n1 | awk \{print\ \$6\})
+
+
+cat > answers <<EOF
+# Example answer file for setup-alpine script
+# If you don't want to use a certain option, then comment it out
+
+# Use US layout with US variant
+KEYMAPOPTS="us us"
+
+# Set hostname to alpine-test
+#HOSTNAMEOPTS="-n ovpn-stage"
+
+# Contents of /etc/network/interfaces
+INTERFACESOPTS="auto lo
+iface lo inet loopback
+
+auto $if
+iface $if inet dhcp
+"
+#iface $if inet static
+#	address 10.118.133.133/22
+#	gateway 10.118.132.1
+#"
+
+# Search domain of example.com, Google public nameserver
+DNSOPTS="-d local  8.8.4.4  8.8.8.8"
+#DNSOPTS="-d krit.pro 10.118.131.100 10.118.145.13"
+
+# Set timezone to UTC
+TIMEZONEOPTS="-z Europe/Samara"
+
+# set http/ftp proxy
+PROXYOPTS="none"
+
+# Add a random mirror
+APKREPOSOPTS="http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/main
+http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/community
+#http://mirror.yandex.ru/mirrors/alpine/edge/main
+#http://mirror.yandex.ru/mirrors/alpine/edge/community
+#http://mirror.yandex.ru/mirrors/alpine/edge/testing
+"
+
+# Install Openssh
+SSHDOPTS="-c openssh"
+
+# Use openntpd
+NTPOPTS="-c chrony"
+
+# Use /dev/sda as a data disk
+DISKOPTS="-m data none"
+
+# Setup in /media/sdb1
+LBUOPTS="$usb"
+APKCACHEOPTS="$usb/cache"
+EOF
+
+setup-alpine -f answers
+setup-lbu "$usb"
+setup-apkcache "$usb/cache"
+setup-hostname m001
+
+sed -i s%^#PermitRootLogin\ prohibit-password\$%PermitRootLogin\ yes% /etc/ssh/sshd_config || exit 1
+service sshd restart
+
+apk -U upgrade
+lbu ci
+
+####
+####
+####
+####
+
+apk -U add nano screen bridge bridge-utils bonding vlan zfs zfs-udev eudev drbd-utils xen xen-hypervisor xen-qemu seabios ovmf lsblk blkid bridge-utils cpufrequtils intel-ucode parted nvme-cli rsync sgdisk cfdisk fio
+apk -U add nano screen bridge bridge-utils bonding vlan zfs zfs-udev eudev drbd-utils xen xen-hypervisor xen-qemu seabios ovmf lsblk blkid bridge-utils cpufrequtils intel-ucode parted nvme-cli rsync sgdisk cfdisk fio lsscsi python3 qemu-system-x86_64 qemu-system-i386 iftop
+
+setup-devd udev
+
+# rc-update add udev default
+rc-update add zfs-import default
+rc-update add zfs-mount default
+rc-update add local default
+rc-update add xenconsoled default
+rc-update add xendomains default
+rc-update add xenqemu default
+rc-update add xenstored default
+
+grep -w xen-netback /etc/modules || echo xen-netback >> /etc/modules
+grep -w xen-blkback /etc/modules || echo xen-blkback >> /etc/modules
+grep -w tun /etc/modules || echo tun >> /etc/modules
+
+mount -o remount,rw /media/nvme0n1p1
+
+cat <<EOF> /media/nvme0n1p1/loader/loader.conf
+default xen
+timeout 3
+EOF
+
+cp -f /usr/lib/efi/xen* /media/nvme0n1p1/boot/
+
+cat <<EOF>/media/nvme0n1p1/boot/xen.cfg
+[global]
+default=xen
+
+[xen]
+options=dom0_mem=8192M
+kernel=vmlinuz-lts modules=loop,squashfs,sd-mod,usb-storage quiet nomodeset
+ramdisk=initramfs-lts
+EOF
+
+cat > /etc/modprobe.d/zfs.conf <<'EOF'
+# RAM min cache 1GiB
+#options zfs zfs_arc_min=1073741824
+# RAM min cache 2GiB
+options zfs zfs_arc_min=2147483648
+# RAM min cache 10GiB
+#options zfs zfs_arc_min=10737418240
+
+
+# RAM max cache 4GiB
+options zfs zfs_arc_max=4294967296
+# RAM max cache 7GiB
+#options zfs zfs_arc_max=7516192768
+# RAM max cache 40GiB
+#options zfs zfs_arc_max=42949672960
+# RAM max cache 300GiB
+#options zfs zfs_arc_max=322122547200
+# 400GB - max
+#options zfs zfs_arc_max=429496729600
+
+
+# включить кэширование поточных данных
+options zfs l2arc_noprefetch=0
+
+# максимальная скорость записи в L2ARC
+#options zfs l2arc_write_max=134217728
+#26214400
+
+# boost скорости.
+#options zfs l2arc_write_boost=134217728
+#52428800
+EOF
+
+# zpool create -f -o ashift=12 \
+-O canmount=on \
+-O atime=off \
+-O recordsize=8k \
+-O compression=lz4 \
+vm raidz \
+nvme-KINGSTON_SKC3000D2048G_50026B7686C1A4B7-part2 \
+nvme-KINGSTON_SKC3000D2048G_50026B7686C1A4C8-part2 \
+nvme-KINGSTON_SKC3000D2048G_50026B7686C1B4F7-part2
+
+lbu ci -d
+
+
+reboot
+
+
+
+# apk add xen xen-hypervisor
+
+# usb="$(df | grep /media/ | grep -v sr0 | head -n1 | awk \{print\ \$6\})"
+# mount -o remount,rw $usb
+# cp -f /usr/lib/efi/xen* $usb/boot/
+
+# cat <<EOF>$usb/boot/xen.cfg
+# [global]
+# default=xen
+
+# [xen]
+# options=dom0_mem=8192M
+# kernel=vmlinuz-lts modules=loop,squashfs,sd-mod,usb-storage quiet nomodeset
+# ramdisk=initramfs-lts
+# EOF
+
+# cat <<EOF> $usb/loader/loader.conf
+# default xen
+# timeout 3
+# EOF
+
+# lbu ci -d
+
+# reboot
+
+
+
+# setup-xen-dom0
+# sed -i 's%^XENDOMAINS_SAVE=.*%XENDOMAINS_SAVE=%' /etc/default/xendomains
+# sed -i "/\/v$(cut -d. -f-2 \/etc\/alpine-release)\/community$/s%^#%%" /etc/apk/repositories
+# apk -U add multipath-tools nano screen wipefs udev zfs zfs-udev cloud-utils-growpart || exit 1
+# setup-udev
+# modprobe zfs
