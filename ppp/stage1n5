@@ -1,0 +1,90 @@
+#!/bin/ash
+
+# setup-hostname n5
+# hostname n5
+# 
+# setup-interfaces -ri <<'EOF'
+# auto lo
+# iface lo inet loopback
+# 
+# auto eth2
+# iface eth2 inet static
+#         address 10.128.136.135/25
+#         gateway 10.128.136.129
+# EOF
+# 
+# setup-dns -d ppproekt.ru 10.128.135.125
+# 
+# setup-sshd openssh
+# 
+# echo 'root:123' | chpasswd
+# 
+# sed -i '/^#PermitRoot/a PermitRootLogin yes' /etc/ssh/sshd_config
+# service sshd restart
+PARTPREFIX=1
+#PARTPREFIX=p1
+dev=${1:-sde}
+
+setup-apkrepos http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/main \
+http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/community
+
+apk add parted e2fsprogs util-linux syslinux sfdisk sgdisk git nano eudev zfs curl wipefs || exit 1
+wipefs -fa /dev/$dev
+sfdisk /dev/$dev <<EOF
+label: dos
+label-id: 0x00000000
+device: /dev/none
+unit: sectors
+sector-size: 512
+
+#2GB vfat
+#/dev/none : start=          32, size=     4194304, type=c, bootable
+
+#0.5GB ext3
+#/dev/none : start=          32, size=     1048576, type=83, bootable
+
+#1GB ext3
+#/dev/none : start=          32, size=     2097120, type=83, bootable
+
+#2GB ext3
+#/dev/none : start=          32, size=     4194304, type=83, bootable
+
+#3GB ext3
+#/dev/none : start=          32, size=     6291456, type=83, bootable
+
+#9GB ext3
+/dev/none : start=          32, size=     18874368, type=83, bootable
+EOF
+mkfs.ext4 -F /dev/${dev}${PARTPREFIX} || exit 2
+#mkfs.ext3 -F /dev/${dev}${PARTPREFIX} || exit 2
+#mkdosfs -F32 /dev/${dev}${PARTPREFIX} || exit 2
+sync
+dd if=/usr/share/syslinux/mbr.bin of=/dev/$dev conv=notrunc
+sync
+mkdir -p /media/target
+
+# Only for vfat need.
+#syslinux /dev/${dev}${PARTPREFIX}
+
+mount -t ext4 /dev/${dev}${PARTPREFIX} /media/target || exit 3
+#mount -t ext3 /dev/${dev}${PARTPREFIX} /media/target || exit 3
+#mount -t vfat /dev/${dev}${PARTPREFIX} /media/target || exit 3
+
+# Only for ext3/4 need.
+extlinux --install /media/target || extlinux --update /media/target || exit 4
+
+setup-keymap us us
+setup-ntp chrony
+#setup-ntp busybox
+setup-devd udev
+setup-timezone -i Europe/Samara
+setup-disk -m data none
+setup-apkcache /media/${dev}${PARTPREFIX}/cache
+setup-lbu /media/${dev}${PARTPREFIX}
+#mdev -s
+
+cdrom="$(df | grep /media/ | head -n1 | awk \{print\ \$6\})"
+cp -aT $cdrom/. /root/a1 /media/target
+umount /media/target
+
+echo 'Stage #1: All done! Need reboot and run next stage #2.'

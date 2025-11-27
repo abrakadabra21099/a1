@@ -2,7 +2,7 @@
 # manual steps
 setup-interfaces -ra
 echo root:123 | chpasswd
-setup-sshd # [enter], yes, [enter]
+setup-sshd openssh
 
 #
 setup-apkrepos http://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/main \
