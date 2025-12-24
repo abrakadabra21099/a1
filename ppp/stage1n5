@@ -9,7 +9,8 @@
 # 
 # auto eth2
 # iface eth2 inet static
-#         address 10.128.136.135/25
+#         address 10.128.136.135
+#         netmask 255.255.255.128
 #         gateway 10.128.136.129
 # EOF
 # 
