@@ -1,7 +1,7 @@
 #!/bin/ash
 sed -i 's%^XENDOMAINS_SAVE=.*%XENDOMAINS_SAVE=%' /etc/default/xendomains
 sed -i "/\/v$(cut -d. -f-2 \/etc\/alpine-release)\/community$/s%^#%%" /etc/apk/repositories
-apk -U add multipath-tools nano screen util-linux udev zfs zfs-udev cloud-utils-growpart || exit 1
+apk -U add multipath-tools nano screen util-linux udev zfs zfs-udev cloud-utils-growpart grub-xenhost || exit 1
 setup-udev
 modprobe zfs
 #grep -q '^\tfilter = ' /etc/lvm/lvm.conf || \
