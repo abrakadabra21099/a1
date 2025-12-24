@@ -1,5 +1,5 @@
 #!/bin/ash
-apk add lvm2 vlan thin-provisioning-tools bonding multipath-tools bridge bridge-utils nano screen cloud-utils-growpart || exit 1
+apk add lvm2 vlan thin-provisioning-tools bonding multipath-tools bridge bridge-utils nano screen cloud-utils-growpart grub-xenhost || exit 1
 sed -i 's%^XENDOMAINS_SAVE=.*%XENDOMAINS_SAVE=%' /etc/default/xendomains
 grep -q '^\tfilter = ' /etc/lvm/lvm.conf || \
 	sed -i '/# filter = \[ "a|\.\*\/|" \]/a \\tfilter = [ "a|^/dev/sd.*|", "r/.*/" ]' /etc/lvm/lvm.conf
