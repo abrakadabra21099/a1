@@ -63,9 +63,9 @@ PROXYOPTS="none"
 # Add a random mirror
 APKREPOSOPTS="https://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/main
 https://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/community
-#http://mirror.yandex.ru/mirrors/alpine/edge/main
-#http://mirror.yandex.ru/mirrors/alpine/edge/community
-#http://mirror.yandex.ru/mirrors/alpine/edge/testing
+#https://mirror.yandex.ru/mirrors/alpine/edge/main
+#https://mirror.yandex.ru/mirrors/alpine/edge/community
+#https://mirror.yandex.ru/mirrors/alpine/edge/testing
 "
 
 # Install Openssh
