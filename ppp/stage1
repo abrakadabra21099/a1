@@ -1,0 +1,75 @@
+######
+######
+######
+
+root
+mac=$(cat /sys/class/net/eth0/address)
+macs='
+n0 10:ff:e0:cd:f9:45
+n1 60:cf:84:a9:6e:e5
+n2 60:cf:84:a9:70:ac
+n3 cc:28:aa:46:32:d8
+n4 60:cf:84:a9:71:97
+'
+name=$(echo "$macs"|grep -i \ $mac$|cut -d\  -sf1)
+[ -z "$name" ]&&echo 'Hostname by MAC not found.'&&exit 1
+setup-hostname $name
+hostname $name
+setup-interfaces -ri <<EOF
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+  address 10.128.136.13${name//n}
+  netmask 255.255.255.128
+  gateway 10.128.136.129
+EOF
+setup-dns -d ppproekt.ru 10.128.135.125
+mkdir -pm0700 ~/.ssh
+cat <<'EOF'> ~/.ssh/authorized_keys
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ/yKEvxmi+uivYvNRzGqYhaSPWGC6nprQX/2iIkGDvj smv@4idesk
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMR/qqDxOEUiwRVQnEGv4nCeQvIGf0tICUd2S8ulHeqC smv@4inote
+EOF
+setup-sshd openssh
+
+#
+cat<<EOF>/etc/apk/repositories
+/media/cdrom/apks
+https://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/main
+https://mirror.yandex.ru/mirrors/alpine/v$(cut -d. -f-2 /etc/alpine-release)/community
+EOF
+setup-keymap us us
+setup-devd udev
+setup-ntp chrony
+setup-timezone -i Europe/Samara
+rc-update add networking boot
+rc-update add seedrng boot
+rc-update add acpid default
+rc-update add crond default
+sed -i /127\\.0\\.0\\.1/s%.*%127.0.0.1\\t$(hostname -f)\ $(hostname)\ localhost\ localhost.localdomain% /etc/hosts
+
+export USE_EFI=YES
+export SWAP_SIZE=0
+export ROOT_SIZE=10240
+yes|setup-disk -m sys /dev/sda
+reboot
+## !!! And not boot normaly
+
+##
+sed -i s%v3\\.22%v3.23% /etc/apk/repositories
+apk add --upgrade apk-tools
+apk upgrade --available
+
+rc-update add xendomains default
+grep -q ^GRUB_CMDLINE_XEN= /etc/default/grub || echo 'GRUB_CMDLINE_XEN="dom0_vcpus_pin dom0_max_vcpus=4 dom0_mem=24G,max:24G"'|tee -a /etc/default/grub
+update-grub
+cat <<'EOF'>/etc/modprobe.d/zfs.conf
+# RAM max cache 20GiB (1024^3x20)
+options zfs zfs_arc_max=21474836480
+EOF
+apk add cloud-utils-growpart e2fsprogs-extra lsblk nano screen util-linux udev zfs zfs-udev cloud-utils-growpart grub-xenhost
+modprobe zfs
+growpart /dev/sda 2
+e2fsck -f /dev/sda2
+resize2fs /dev/sda2
