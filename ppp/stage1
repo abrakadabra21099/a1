@@ -43,32 +43,33 @@ setup-keymap us us
 setup-devd udev
 setup-ntp chrony
 setup-timezone -i Europe/Samara
+setup-xen-dom0
 rc-update add networking boot
 rc-update add seedrng boot
 rc-update add acpid default
 rc-update add crond default
+rc-update add xendomains default
+update-grub
 sed -i /127\\.0\\.0\\.1/s%.*%127.0.0.1\\t$(hostname -f)\ $(hostname)\ localhost\ localhost.localdomain% /etc/hosts
+cat <<'EOF'>/etc/modprobe.d/zfs.conf
+# RAM max cache 20GiB (1024^3x20)
+options zfs zfs_arc_max=21474836480
+EOF
+apk add cloud-utils-growpart e2fsprogs-extra lsblk nano screen util-linux udev zfs zfs-udev cloud-utils-growpart grub-xenhost
 
 export USE_EFI=YES
 export SWAP_SIZE=0
 export ROOT_SIZE=10240
 yes|setup-disk -m sys /dev/sda
 reboot
-## !!! And not boot normaly
 
-##
-sed -i s%v3\\.22%v3.23% /etc/apk/repositories
-apk add --upgrade apk-tools
-apk upgrade --available
 
-rc-update add xendomains default
 grep -q ^GRUB_CMDLINE_XEN= /etc/default/grub || echo 'GRUB_CMDLINE_XEN="dom0_vcpus_pin dom0_max_vcpus=4 dom0_mem=24G,max:24G"'|tee -a /etc/default/grub
-update-grub
-cat <<'EOF'>/etc/modprobe.d/zfs.conf
-# RAM max cache 20GiB (1024^3x20)
-options zfs zfs_arc_max=21474836480
-EOF
-apk add cloud-utils-growpart e2fsprogs-extra lsblk nano screen util-linux udev zfs zfs-udev cloud-utils-growpart grub-xenhost
+# cat <<'EOF'>/etc/modprobe.d/zfs.conf
+# # RAM max cache 20GiB (1024^3x20)
+# options zfs zfs_arc_max=21474836480
+# EOF
+# apk add cloud-utils-growpart e2fsprogs-extra lsblk nano screen util-linux udev zfs zfs-udev cloud-utils-growpart grub-xenhost
 modprobe zfs
 growpart /dev/sda 2
 e2fsck -f /dev/sda2
